@@ -97,20 +97,8 @@ export class Board {
         for (let x = this.boardStartX; x < this.boardEndX; x++) {
             for (let y = this.boardStartY; y < this.boardEndY; y++) {
                 // Random rotation -2 to +1 aka -180, -90, 0, 90?
-                // Java: (RandomNumberGenerator.nextInt(4) - 2) * 90
-                // nextInt(4) is 0,1,2,3. -2 -> -2, -1, 0, 1. * 90 -> -180, -90, 0, 90.
                 const rots = Math.floor(Math.random() * 4) - 2;
                 this.cellMatrix[x][y].rotate(rots * 90, 0);
-                // Fix immediate rotation by clearing animation?
-                // Java has rotateImmediate, but rotate with time 0 should work if handled.
-                // Actually my Cell implementation sets rotateStart. I should handle immediate.
-                // But let's just use rotate() and let it animate/snap.
-                // Wait, initial board setup shouldn't be animated probably.
-                // For now, let's just manually set the dirs for the initial scramble.
-
-                // Better yet: Cell.rotate() adds to target.
-                // I need to implement basic "set layout without animation" or just let it spin on start (could be a cool effect).
-                // Let's stick to the Java logic: `rotate` is called.
             }
         }
 

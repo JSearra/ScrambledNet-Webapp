@@ -1,4 +1,5 @@
-body, html {
+body,
+html {
     margin: 0;
     padding: 0;
     width: 100%;
@@ -7,20 +8,27 @@ body, html {
     background-color: #222;
     color: #eee;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
 }
 
 #game-container {
     position: relative;
+    flex: 1;
     width: 100%;
-    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
+    /* Prevent canvas from pushing bounds */
 }
 
 canvas {
     touch-action: none;
-    image-rendering: pixelated; /* Keep crisp edges for pixel art */
+    image-rendering: pixelated;
+    /* Keep crisp edges for pixel art */
+    max-width: 100%;
+    max-height: 100%;
 }
 
 #ui-overlay {
@@ -47,6 +55,25 @@ h1 {
     text-shadow: 0 0 10px #0f0;
 }
 
+.stats-container {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #444;
+}
+
+.stats-container p {
+    font-size: 1.5rem;
+    margin: 0.5rem 0;
+    color: #fff;
+}
+
+.stats-container span {
+    color: #0f0;
+    font-weight: bold;
+}
+
 button {
     padding: 1rem 2rem;
     font-size: 1.2rem;
@@ -64,13 +91,22 @@ button:hover {
 }
 
 #controls {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
     display: flex;
     gap: 10px;
-    z-index: 5;
-    flex-wrap: wrap;
+    padding: 10px;
+    background-color: #333;
+    width: 100%;
     justify-content: center;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    /* Ensure padding doesn't affect width */
+    z-index: 5;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+    button {
+        padding: 0.8rem 1.2rem;
+        font-size: 1rem;
+    }
 }

@@ -4,6 +4,7 @@ import { SKILL } from './constants.js';
 window.addEventListener('load', () => {
     const canvas = document.getElementById('game-canvas');
     const game = new Game(canvas);
+    window.game = game;
 
     // Initial Start
     game.start(SKILL.NORMAL);

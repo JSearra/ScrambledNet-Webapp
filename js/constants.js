@@ -19,10 +19,10 @@ export const SKILL = {
 export const SCREEN_SIZES = {
     // Width/Height for different skill levels
     HUGE: {
-        major: 17, minor: 10, // Master/Insane
-        expert_major: 15, expert_minor: 8,
-        normal_major: 11, normal_minor: 8,
-        novice_major: 10, novice_minor: 8
+        major: 10, minor: 7, // Master/Insane (was 15x9)
+        expert_major: 8, expert_minor: 6, // Expert (was 12x8)
+        normal_major: 6, normal_minor: 5, // Normal (was 8x6)
+        novice_major: 5, novice_minor: 5
     }
 };
 

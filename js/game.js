@@ -11,6 +11,9 @@ export class Game {
         this.running = false;
         this.lastTime = 0;
         this.currentSkill = null;
+        this.moves = 0;
+        this.startTime = 0;
+
 
         // Input handling
         // Handle both mouse and touch
@@ -38,6 +41,10 @@ export class Game {
             await this.assets.loadAll();
         }
 
+        // Reset stats
+        this.moves = 0;
+        this.startTime = Date.now();
+
         // Reset and Resize
         this.resize();
 
@@ -48,8 +55,9 @@ export class Game {
         // Wait, SCREEN_SIZES has 17,10 etc.
         // In BoardView.java: FindMaximumGridforScreenSize() sets gridWidth/Height based on screen orientation.
         // here let's just use window aspect ratio
-        const w = window.innerWidth;
-        const h = window.innerHeight;
+        const container = this.canvas.parentElement;
+        const w = container.clientWidth;
+        const h = container.clientHeight;
         const ratio = w / h;
 
         // Determine grid dimensions based on skill and aspect ratio
@@ -77,8 +85,9 @@ export class Game {
     }
 
     resize() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
+        const container = this.canvas.parentElement;
+        this.canvas.width = container.clientWidth;
+        this.canvas.height = container.clientHeight;
         if (this.board && this.board.cellMatrix.length > 0) {
             this.board.setSize(this.canvas.width, this.canvas.height);
         }
@@ -88,7 +97,10 @@ export class Game {
         const rect = this.canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        this.board.handleInput(x, y);
+        const validMove = this.board.handleInput(x, y);
+        if (validMove && this.running) {
+            this.moves++;
+        }
     }
 
     loop(now) {
@@ -109,6 +121,16 @@ export class Game {
         if (result === 'WIN') {
             this.assets.playSound('win.ogg');
             this.running = false;
+
+            const endTime = Date.now();
+            const totalTime = Math.floor((endTime - this.startTime) / 1000);
+            const minutes = Math.floor(totalTime / 60);
+            const seconds = totalTime % 60;
+            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            document.getElementById('time-display').innerText = timeString;
+            document.getElementById('moves-display').innerText = this.moves;
+
             document.getElementById('ui-overlay').classList.remove('hidden');
         }
 
