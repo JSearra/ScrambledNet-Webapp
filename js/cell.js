@@ -64,6 +64,8 @@ export class Cell {
         this.isLocked = false;
         this.isBlind = false;
 
+        this.solutionDirs = CellDirection.NONE;
+
         this.rotateTarget = 0;
         this.rotateStart = 0;
         this.rotateAngle = 0;
@@ -87,6 +89,7 @@ export class Cell {
         this.isRoot = false;
         this.isLocked = false;
         this.isBlind = false;
+        this.solutionDirs = CellDirection.NONE;
         this.rotateTarget = 0;
         this.rotateAngle = 0;
     }

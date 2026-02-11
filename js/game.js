@@ -32,6 +32,15 @@ export class Game {
         }, { passive: false });
     }
 
+    stop() {
+        this.running = false;
+    }
+
+    toggleSound() {
+        this.assets.muted = !this.assets.muted;
+        return !this.assets.muted;
+    }
+
     async start(skill) {
         this.currentSkill = skill;
         this.running = false; // Stop current loop
@@ -50,11 +59,9 @@ export class Game {
 
         // Setup Board
         // Get grid size for skill
-        const gridSize = getBoardSize(skill.label.toUpperCase(), 1000, 1000); // 1000 is arbitrary large number to indicate landscape/portrait preference if we knew screen ratio, here we default
-        // Actually getBoardSize takes gridWidth/Height which are ints like 10,11. 
-        // Wait, SCREEN_SIZES has 17,10 etc.
-        // In BoardView.java: FindMaximumGridforScreenSize() sets gridWidth/Height based on screen orientation.
-        // here let's just use window aspect ratio
+        const gridSize = getBoardSize(skill.label.toUpperCase(), 1000, 1000);
+
+        // use window aspect ratio
         const container = this.canvas.parentElement;
         const w = container.clientWidth;
         const h = container.clientHeight;
@@ -107,8 +114,7 @@ export class Game {
         if (!this.running) return;
 
         const dt = now - this.lastTime;
-        // this.lastTime = now; // update lastTime at end? No, doUpdate uses 'now'.
-        // Java: doUpdate(now).
+
 
         const result = this.board.update(now);
 
@@ -118,18 +124,23 @@ export class Game {
 
         this.board.draw(this.ctx);
 
+        // Update Stats
+        const currentTime = Date.now();
+        const totalTime = Math.floor((currentTime - this.startTime) / 1000);
+        const minutes = Math.floor(totalTime / 60);
+        const seconds = totalTime % 60;
+        const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        document.getElementById('time-display').innerText = timeString;
+        document.getElementById('moves-display').innerText = this.moves;
+
         if (result === 'WIN') {
             this.assets.playSound('win.ogg');
             this.running = false;
 
-            const endTime = Date.now();
-            const totalTime = Math.floor((endTime - this.startTime) / 1000);
-            const minutes = Math.floor(totalTime / 60);
-            const seconds = totalTime % 60;
-            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-            document.getElementById('time-display').innerText = timeString;
-            document.getElementById('moves-display').innerText = this.moves;
+            // Update final stats for overlay
+            document.getElementById('final-time').innerText = timeString;
+            document.getElementById('final-moves').innerText = this.moves;
 
             document.getElementById('ui-overlay').classList.remove('hidden');
         }

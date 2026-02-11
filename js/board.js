@@ -43,6 +43,10 @@ export class Board {
         this.cellWidth = Math.floor(width / this.gridWidth);
         this.cellHeight = Math.floor(height / this.gridHeight);
 
+        // Enforce even cell sizes to avoid sub-pixel rendering misalignment during rotation
+        if (this.cellWidth % 2 !== 0) this.cellWidth--;
+        if (this.cellHeight % 2 !== 0) this.cellHeight--;
+
         if (this.cellWidth < this.cellHeight) this.cellHeight = this.cellWidth;
         else this.cellWidth = this.cellHeight;
 
@@ -93,6 +97,13 @@ export class Board {
         // Generate Net
         this.createNet(skill);
 
+        // Save Solution State
+        for (let x = this.boardStartX; x < this.boardEndX; x++) {
+            for (let y = this.boardStartY; y < this.boardEndY; y++) {
+                this.cellMatrix[x][y].solutionDirs = this.cellMatrix[x][y].connectedDirs;
+            }
+        }
+
         // Jumble
         for (let x = this.boardStartX; x < this.boardEndX; x++) {
             for (let y = this.boardStartY; y < this.boardEndY; y++) {
@@ -133,40 +144,48 @@ export class Board {
         this.rootCell.isConnected = true;
         this.rootCell.isRoot = true;
 
+        // Active list of cells that are part of the net and might have free neighbors
         let list = [this.rootCell];
-        if (Math.random() > 0.5) this.addRandomDir(list);
 
         while (list.length > 0) {
-            if (Math.random() > 0.5) {
-                this.addRandomDir(list);
-                if (Math.random() > 0.5) this.addRandomDir(list);
-                if (skill.branches >= 3 && Math.floor(Math.random() * 3) === 0) this.addRandomDir(list);
+            // Selection Strategy:
+            // "Last" (Index = list.length-1) -> Recursive Backtracker (DFS) -> Long winding paths ("Rivers").
+            // "Random" -> Prim's Algorithm -> Many short branches ("Blob").
+            // We mix them based on desired 'branchiness'.
+
+            // High branches (Master/Insane) -> More Randomness to create difficult branching.
+            // Low branches (Novice/Normal) -> More DFS for easier flowing paths.
+
+            const dfsProb = (skill.branches >= 3) ? 0.5 : 0.8;
+
+            let index;
+            if (Math.random() < dfsProb) {
+                index = list.length - 1;
             } else {
-                list.push(list[0]);
+                index = Math.floor(Math.random() * list.length);
             }
-            list.shift();
-        }
-    }
 
-    addRandomDir(list) {
-        const cell = list[0];
-        const freeNeighbours = [];
+            const cell = list[index];
+            const freeNeighbours = [];
 
-        for (const d of CARDINALS) {
-            const ucell = cell.next(d);
-            if (ucell && ucell.connectedDirs === CellDirection.FREE) {
-                freeNeighbours.push({ dir: d, cell: ucell });
+            for (const d of CARDINALS) {
+                const ucell = cell.next(d);
+                if (ucell && ucell.connectedDirs === CellDirection.FREE) {
+                    freeNeighbours.push({ dir: d, cell: ucell });
+                }
+            }
+
+            if (freeNeighbours.length === 0) {
+                list.splice(index, 1);
+            } else {
+                const pick = freeNeighbours[Math.floor(Math.random() * freeNeighbours.length)];
+
+                cell.addDir(pick.dir);
+                pick.cell.addDir(REVERSE_DIRS[pick.dir]);
+
+                list.push(pick.cell);
             }
         }
-
-        if (freeNeighbours.length === 0) return;
-
-        const pick = freeNeighbours[Math.floor(Math.random() * freeNeighbours.length)];
-
-        cell.addDir(pick.dir);
-        pick.cell.addDir(REVERSE_DIRS[pick.dir]);
-
-        list.push(pick.cell);
     }
 
     updateConnections() {
@@ -238,11 +257,7 @@ export class Board {
 
                         cell.rotate(90, 250);
                         this.assets.playSound('click.ogg');
-                        // We check connections after rotation updates. 
-                        // But since rotation is animated, we might need to verify when to check.
-                        // Java `doUpdate` triggers `updateConnections` if changed.
-                        // Here we'll just let the loop handle it? 
-                        // Actually, Java `BoardView` handles checking connections.
+
                         return true;
                     }
                 }
@@ -276,5 +291,18 @@ export class Board {
                 this.cellMatrix[x][y].draw(ctx);
             }
         }
+    }
+
+    autoSolve() {
+        for (let x = this.boardStartX; x < this.boardEndX; x++) {
+            for (let y = this.boardStartY; y < this.boardEndY; y++) {
+                const cell = this.cellMatrix[x][y];
+                cell.connectedDirs = cell.solutionDirs;
+                cell.rotateTarget = 0;
+                cell.rotateAngle = 0;
+            }
+        }
+        this.updateConnections();
+        return "Solved!";
     }
 }

@@ -4,24 +4,37 @@ export class Assets {
         this.sounds = {};
         this.toLoad = 0;
         this.loaded = 0;
+        this.muted = false;
+        this.theme = 'modern'; // Default theme
+    }
+
+    setTheme(theme) {
+        this.theme = theme;
+        // Reload all images with the new theme path
+        this.loaded = 0;
+        this.toLoad = 0;
+        return this.loadAll();
     }
 
     loadImage(name) {
         this.toLoad++;
         const img = new Image();
-        img.src = `assets/images/${name}`;
-        img.onload = () => this.loaded++;
+        const basePath = this.theme === 'modern' ? 'assets/images/' : 'assets/';
+        img.src = `${basePath}${name}`;
+        img.onload = () => {
+            this.loaded++;
+            // console.log('Loaded', name);
+        };
         img.onerror = (e) => console.error('Failed to load image', name, e);
         this.images[name] = img;
     }
 
     loadSound(name) {
-        // Use Audio object for simplicity
+
         this.toLoad++;
         const snd = new Audio(`assets/audio/${name}`);
         snd.oncanplaythrough = () => {
-            // We can count it as loaded, but audio sometimes is tricky.
-            // For this simple gate, we'll just assume it loads eventually or doesn't block critical render.
+
             this.loaded++;
         };
         snd.onerror = (e) => console.error('Failed to load sound', name, e);
@@ -29,6 +42,7 @@ export class Assets {
     }
 
     loadAll() {
+        // Both themes have the same file names
         const imageFiles = [
             'background.png', 'background_locked.png', 'empty.png', 'nothing.png',
             'server.png', 'computer1.png', 'computer2.png',
@@ -38,18 +52,30 @@ export class Assets {
             'cable1101.png', 'cable1110.png', 'cable1111.png'
         ];
 
-        const soundFiles = [
-            'click.ogg', 'win.ogg'
-        ];
+
+        if (this.theme === 'retro') {
+            this.loadImage('game_background.png');
+            this.loadImage('splash_bg.jpg');
+        } else {
+
+        }
+
+
 
         imageFiles.forEach(f => this.loadImage(f));
-        soundFiles.forEach(f => this.loadSound(f));
+
+
+        if (Object.keys(this.sounds).length === 0) {
+            const soundFiles = [
+                'click.ogg', 'win.ogg'
+            ];
+            soundFiles.forEach(f => this.loadSound(f));
+        }
 
         return new Promise(resolve => {
             const check = () => {
-                // Determine completion. Audio loading can be finicky without user interaction first.
-                // We'll trust images are critical.
-                if (this.loaded >= imageFiles.length) {
+
+                if (this.toLoad > 0 && this.loaded >= this.toLoad) {
                     resolve();
                 } else {
                     requestAnimationFrame(check);
@@ -64,6 +90,7 @@ export class Assets {
     }
 
     playSound(name) {
+        if (this.muted) return;
         const snd = this.sounds[name];
         if (snd) {
             snd.currentTime = 0;

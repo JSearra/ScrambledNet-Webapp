@@ -4,28 +4,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Modern Scrambled Net</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Scrambled Net</title>
+    <title>Scrambled Net</title>
 </head>
 
 <body>
-    <div id="game-container">
-        <canvas id="game-canvas"></canvas>
-        <div id="ui-overlay" class="hidden">
-            <h1 id="message">You Win!</h1>
-            <div id="stats" class="stats-container">
+    <div id="start-screen">
+        <img src="assets/logo.png" alt="Scrambled Net" class="game-logo">
+        <div class="difficulty-menu">
+            <button id="skill-novice" class="menu-btn">Novice</button>
+            <button id="skill-normal" class="menu-btn">Normal</button>
+            <button id="skill-expert" class="menu-btn">Expert</button>
+            <button id="skill-master" class="menu-btn">Master</button>
+            <button id="skill-insane" class="menu-btn">Insane</button>
+            <button id="instructions-btn" class="menu-btn">Instructions</button>
+            <button id="settings-btn" class="menu-btn">Settings</button>
+        </div>
+    </div>
+
+    <!-- Instructions Modal -->
+    <div id="instructions-screen" class="hidden modal-overlay">
+        <div class="modal-content instructions-modal">
+            <h2>Scrambled Net</h2>
+            <div class="instructions-text">
+                <p><strong>Scrambled Net</strong> is a simple puzzle game which requires you to sort out the connections
+                    in a computer network, so that all the terminals are connected to the server. The network is made up
+                    of tiles, and while all the tiles are in the right place, they have been rotated randomly into a
+                    useless mess.</p>
+                <p>You need to rotate individual tiles to re-connect the network. Tiles which are connected to the
+                    server are shown highlighted. When all terminals are connected, you've won.</p>
+
+                <h3>Controls</h3>
+                <p>Tap any tile to rotate it once clockwise. Keep tapping until the tile is in the right orientation.
+                </p>
+
+
+                <h3>Skill Levels</h3>
+                <ul>
+                    <li><strong>Novice:</strong> Small board. Connect edges carefully.</li>
+                    <li><strong>Normal:</strong> Larger board. You can always finish by using all tiles.</li>
+                    <li><strong>Expert:</strong> Even larger board.</li>
+                    <li><strong>Master:</strong> Large board, wraps around edges (connections go off one side and enter
+                        the other). Also includes 4-way connections.</li>
+                    <li><strong>Insane:</strong> Same as Master, but harder!</li>
+                </ul>
+
+                <h3>Credits</h3>
+
+                <p> The original Scrambled Net was inspired by KNetWalk, and was built by Ian Cameron Smith. </p>
+                <p> This version was created using updated assets from "Scrambled Net Modern", by jimnastic89
+                    https://github.com/jimnastic89/ModernScrambledNet
+                </p>
+                <p>This version updated and converted to a webapp by Jonathan Searra</p>
+
+            </div>
+            <div class="modal-actions">
+                <button id="instructions-back-btn" class="menu-btn">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-screen" class="hidden modal-overlay">
+        <div class="modal-content">
+            <h2>Settings</h2>
+
+            <div class="setting-row">
+                <label for="setting-sound">Sound Effects</label>
+                <input type="checkbox" id="setting-sound" checked>
+            </div>
+
+            <div class="setting-row">
+                <label for="setting-theme">Theme</label>
+                <select id="setting-theme">
+                    <option value="retro">Retro</option>
+                    <option value="modern">Modern</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button id="settings-close-btn" class="menu-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <div id="top-bar">
+            <div class="stats-container">
                 <p>Time: <span id="time-display">0:00</span></p>
                 <p>Moves: <span id="moves-display">0</span></p>
             </div>
-            <button id="restart-btn">New Game</button>
         </div>
-    </div>
-    <div id="controls">
-        <button id="skill-novice">Novice</button>
-        <button id="skill-normal">Normal</button>
-        <button id="skill-expert">Expert</button>
-        <button id="skill-master">Master</button>
-        <button id="skill-insane">Insane</button>
+
+        <div id="game-container">
+            <canvas id="game-canvas"></canvas>
+            <div id="ui-overlay" class="hidden">
+                <h1 id="message">You Win!</h1>
+                <div id="final-stats" class="stats-container">
+
+                    <p>Time: <span id="final-time"></span></p>
+                    <p>Moves: <span id="final-moves"></span></p>
+                </div>
+                <div class="overlay-buttons">
+                    <button id="play-again-btn" class="menu-btn">Play Again</button>
+                    <button id="menu-btn" class="menu-btn">Menu</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="bottom-bar">
+            <button id="back-btn" class="control-btn">Menu</button>
+        </div>
     </div>
     <script type="module" src="js/main.js"></script>
 </body>
