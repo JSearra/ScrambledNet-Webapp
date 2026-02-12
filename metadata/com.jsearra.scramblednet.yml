@@ -37,7 +37,7 @@ Builds:
       - cd ..
       - npm run build
       - npx cap sync android
-    gradle:
+    build:
       - ./gradlew assembleRelease
       - ls -R app/build/outputs
 
