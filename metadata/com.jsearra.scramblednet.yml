@@ -28,7 +28,6 @@ Builds:
     sudo:
       - npm install -g npm
     init:
-      - cd ..
       - npm install
       - npm run build
       - npx cap sync android
