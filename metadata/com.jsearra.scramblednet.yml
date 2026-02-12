@@ -19,6 +19,9 @@ Description: |
 RepoType: git
 Repo: https://github.com/JSearra/ScrambledNet-Webapp.git
 
+ScanIgnore:
+  - node_modules
+
 Builds:
   - versionName: '1.0'
     versionCode: 1
