@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Modern Scrambled Net</title>
-    <title>Modern Scrambled Net</title>
-  <script type="module" crossorigin src="/assets/index-bPwnmeU1.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-B9KSv59-.css">
+    <title>Scrambled Net</title>
+    <title>Scrambled Net</title>
+  <script type="module" crossorigin src="/assets/index-CgrYCQOF.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-BNKCZ1wr.css">
 </head>
 
 <body>
     <div id="start-screen">
-        <img src="/assets/logo-N_YuRi-9.png" alt="Scrambled Net" class="game-logo">
+        <img src="assets/logo.png" alt="Scrambled Net" class="game-logo">
         <div class="difficulty-menu">
             <button id="skill-novice" class="menu-btn">Novice</button>
             <button id="skill-normal" class="menu-btn">Normal</button>
@@ -35,24 +35,30 @@
                     useless mess.</p>
                 <p>You need to rotate individual tiles to re-connect the network. Tiles which are connected to the
                     server are shown highlighted. When all terminals are connected, you've won.</p>
-                <p>Use the menu to select different skill levels, pause the game, or start a new game.</p>
 
                 <h3>Controls</h3>
                 <p>Tap any tile to rotate it once clockwise. Keep tapping until the tile is in the right orientation.
                 </p>
-                <p>To lock a tile, press and hold it for a second. It will turn darker blue. Unlock by pressing and
-                    holding again. Locking a tile is no indication that it is correct.</p>
+
 
                 <h3>Skill Levels</h3>
                 <ul>
                     <li><strong>Novice:</strong> Small board. Connect edges carefully.</li>
                     <li><strong>Normal:</strong> Larger board. You can always finish by using all tiles.</li>
-                    <li><strong>Expert:</strong> Large board. Terminals have exactly one connection.</li>
+                    <li><strong>Expert:</strong> Even larger board.</li>
                     <li><strong>Master:</strong> Large board, wraps around edges (connections go off one side and enter
                         the other). Also includes 4-way connections.</li>
-                    <li><strong>Insane:</strong> Same as Master, but all 3-way and 4-way connections are invisible! Use
-                        neighbors to deduce orientation.</li>
+                    <li><strong>Insane:</strong> Same as Master, but harder!</li>
                 </ul>
+
+                <h3>Credits</h3>
+
+                <p> The original Scrambled Net was inspired by KNetWalk, and was built by Ian Cameron Smith. </p>
+                <p> This version was created using updated assets from "Scrambled Net Modern", by jimnastic89
+                    https://github.com/jimnastic89/ModernScrambledNet
+                </p>
+                <p>This version updated and converted to a webapp by Jonathan Searra</p>
+
             </div>
             <div class="modal-actions">
                 <button id="instructions-back-btn" class="menu-btn">Back</button>
@@ -97,9 +103,7 @@
             <div id="ui-overlay" class="hidden">
                 <h1 id="message">You Win!</h1>
                 <div id="final-stats" class="stats-container">
-                    <!-- Final stats will be copied here or we just use the top bar? 
-                          Plan said: "New Game" button -> "Play Again" (same difficulty).
-                          "Menu" button (return to start screen). -->
+
                     <p>Time: <span id="final-time"></span></p>
                     <p>Moves: <span id="final-moves"></span></p>
                 </div>

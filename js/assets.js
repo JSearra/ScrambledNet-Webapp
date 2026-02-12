@@ -25,7 +25,10 @@ export class Assets {
             this.loaded++;
             // console.log('Loaded', name);
         };
-        img.onerror = (e) => console.error('Failed to load image', name, e);
+        img.onerror = (e) => {
+            console.error('Failed to load image', name, e);
+            this.loaded++;
+        };
         this.images[name] = img;
     }
 
@@ -33,11 +36,13 @@ export class Assets {
 
         this.toLoad++;
         const snd = new Audio(`assets/audio/${name}`);
-        snd.oncanplaythrough = () => {
-
+        snd.onloadeddata = () => {
             this.loaded++;
         };
-        snd.onerror = (e) => console.error('Failed to load sound', name, e);
+        snd.onerror = (e) => {
+            console.error('Failed to load sound', name, e);
+            this.loaded++;
+        };
         this.sounds[name] = snd;
     }
 
@@ -73,9 +78,12 @@ export class Assets {
         }
 
         return new Promise(resolve => {
+            const start = Date.now();
             const check = () => {
-
                 if (this.toLoad > 0 && this.loaded >= this.toLoad) {
+                    resolve();
+                } else if (Date.now() - start > 3000) {
+                    console.warn('Asset loading timed out, forcing start');
                     resolve();
                 } else {
                     requestAnimationFrame(check);

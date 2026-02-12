@@ -1,0 +1,41 @@
+Categories:
+  - Games
+  - Puzzle
+License: GPL-3.0-only
+SourceCode: https://github.com/JSearra/ScrambledNet-Webapp
+IssueTracker: https://github.com/JSearra/ScrambledNet-Webapp/issues
+
+Name: Scrambled Net
+Summary: Connect the terminals to the server
+Description: |
+    Scrambled Net is a simple puzzle game which requires you to sort out the connections in a computer network, so that all the terminals are connected to the server. The network is made up of tiles, and while all the tiles are in the right place, they have been rotated randomly into a useless mess.
+    
+    You need to rotate individual tiles to re-connect the network. Tiles which are connected to the server are shown highlighted. When all terminals are connected, you've won.
+    
+    Features:
+    * Multiple difficulty levels (Novice to Insane)
+    * Retro and Modern themes
+    * Sound effects
+
+RepoType: git
+Repo: https://github.com/JSearra/ScrambledNet-Webapp.git
+
+Builds:
+  - versionName: 1.0
+    versionCode: 1
+    commit: HEAD
+    subdir: android
+    sudo:
+      - npm install -g npm
+    init:
+      - cd ..
+      - npm install
+      - npm run build
+      - npx cap sync android
+    gradle:
+      - yes
+
+AutoUpdateMode: Version v%v
+UpdateCheckMode: Tags
+CurrentVersion: 1.0
+CurrentVersionCode: 1
