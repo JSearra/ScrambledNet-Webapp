@@ -32,6 +32,7 @@ Builds:
       - cd build/com.jsearra.scramblednet && npm install
       - chown -R vagrant:vagrant /home/vagrant/build/com.jsearra.scramblednet
     init:
+      - cd ..
       - npm run build
       - npx cap sync android
     gradle:
