@@ -19,14 +19,13 @@ Description: |
 RepoType: git
 Repo: https://github.com/JSearra/ScrambledNet-Webapp.git
 
-ScanIgnore:
-  - node_modules
-
 Builds:
   - versionName: '1.0'
     versionCode: 1
     commit: ea33674e9313a3d7add2dba51c02cb6d7db144f0
     subdir: android
+    scanignore:
+      - node_modules
     sudo:
       - apt-get update || apt-get update
       - apt-get install -y curl
