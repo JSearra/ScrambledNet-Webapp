@@ -24,8 +24,6 @@ Builds:
     versionCode: 1
     commit: ea33674e9313a3d7add2dba51c02cb6d7db144f0
     subdir: android
-    scanignore:
-      - node_modules
     sudo:
       - apt-get update || apt-get update
       - apt-get install -y curl
@@ -38,8 +36,10 @@ Builds:
       - npm run build
       - npx cap sync android
     gradle:
-      - assembleRelease
+      - yes
     output: app/build/outputs/apk/release/app-release-unsigned.apk
+    scanignore:
+      - node_modules
 
 AutoUpdateMode: None
 UpdateCheckMode: None
