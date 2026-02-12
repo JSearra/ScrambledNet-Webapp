@@ -37,9 +37,9 @@ Builds:
       - cd ..
       - npm run build
       - npx cap sync android
-    build:
-      - ./gradlew assembleRelease
-      - ls -R app/build/outputs
+    gradle:
+      - assembleRelease
+    output: app/build/outputs/apk/release/app-release-unsigned.apk
 
 AutoUpdateMode: None
 UpdateCheckMode: None
