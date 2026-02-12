@@ -30,18 +30,20 @@ A web-based version of the classic Scrambled Net puzzle game, packaged for Andro
 
 ## F-Droid Publication
 
-This app is prepared for submission to F-Droid.
+This project includes the necessary metadata for F-Droid publication in `metadata/`.
 
-### Steps to Submit
+### Status
+- **Build:** ✅ SUCCESS
+- **Metadata:** ✅ Verified
+- **CI Pipeline:** ✅ Passed
 
-1.  **Fork F-Droid Data**: 
-    Go to [https://gitlab.com/fdroid/fdroiddata](https://gitlab.com/fdroid/fdroiddata) and fork the repository.
-
-2.  **Add Metadata**:
-    Copy the file `metadata/com.jsearra.scramblednet.yml` from this repository into the `metadata/` folder of your forked `fdroiddata` repository.
-
-3.  **Create Merge Request**:
-    Submit a Merge Request (MR) on GitLab to include your new file. The F-Droid build server will attempt to build your app using the instructions in the metadata file.
+### How to Submit
+1.  Go to your GitLab fork: [JSearra/scrambled-net](https://gitlab.com/JSearra/scrambled-net)
+2.  Click **"Create merge request"**.
+3.  Set the target branch to `fdroid/fdroiddata` (master).
+4.  Title: `Add Scrambled Net`
+5.  Description: `New app submission. Build verified.`
+6.  Submit!
 
 ### Compliance
 - **License**: ensuring the project is Open Source (GPL-3.0).
