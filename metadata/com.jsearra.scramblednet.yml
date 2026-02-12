@@ -25,7 +25,8 @@ Builds:
     commit: 7823b163a35d97d09635c05c0be386a3d902641a
     subdir: android
     sudo:
-      - npm install -g npm
+      - apt-get update || apt-get update
+      - apt-get install -y npm
     init:
       - npm install
       - npm run build
