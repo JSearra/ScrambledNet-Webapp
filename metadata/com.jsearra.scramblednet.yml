@@ -38,7 +38,8 @@ Builds:
       - npm run build
       - npx cap sync android
     gradle:
-      - yes
+      - ./gradlew assembleRelease
+      - ls -R app/build/outputs
 
 AutoUpdateMode: None
 UpdateCheckMode: None
