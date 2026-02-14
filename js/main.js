@@ -1,11 +1,12 @@
 import '../style.scss';
+import emptyBg from '../assets/empty.png';
 import { Game } from './game.js';
 import { SKILL } from './constants.js';
 
 window.addEventListener('load', () => {
     const canvas = document.getElementById('game-canvas');
     const game = new Game(canvas);
-    window.game = game;
+    // window.game = game; // Not strictly needed, but helpful for debugging
 
     // UI Elements
     const startScreen = document.getElementById('start-screen');
@@ -116,7 +117,7 @@ window.addEventListener('load', () => {
     function updateThemeVisuals(theme) {
         const gameContainer = document.getElementById('game-container');
         if (theme === 'retro') {
-            gameContainer.style.backgroundImage = "url('assets/empty.png')";
+            gameContainer.style.backgroundImage = `url('${emptyBg}')`;
             gameContainer.style.backgroundSize = "auto"; // Default tiling size (image size)
         } else {
             // Revert to CSS default or specific modern background

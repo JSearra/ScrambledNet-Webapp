@@ -45,7 +45,7 @@ html {
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    background: url('/assets/splash_bg.jpg') no-repeat center center;
+    background: url('assets/splash_bg.jpg') no-repeat center center;
     background-size: cover;
     width: 100%;
     height: 100%;
@@ -236,7 +236,7 @@ html {
     @include flex-center;
     overflow: hidden;
     background-color: #000;
-    background-image: url('/assets/game_background.png');
+    background-image: url('assets/game_background.png');
     background-repeat: repeat;
 }
 

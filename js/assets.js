@@ -1,3 +1,6 @@
+// Use Vite's glob import to get all assets with their hashed URLs
+const assetFiles = import.meta.glob('../assets/**/*', { eager: true, as: 'url' });
+
 export class Assets {
     constructor() {
         this.images = {};
@@ -16,11 +19,26 @@ export class Assets {
         return this.loadAll();
     }
 
+    getAssetUrl(path) {
+        // Resolve the asset path using the glob results
+        // path is relative to the project root, e.g., 'assets/images/foo.png'
+        // assetFiles keys are relative to this file, e.g., '../assets/images/foo.png'
+        const key = `../${path}`;
+        const url = assetFiles[key];
+        if (!url) {
+            console.error(`Asset not found: ${path} (key: ${key})`);
+            return path; // Fallback to original path, though it likely won't work if hashed
+        }
+        return url;
+    }
+
     loadImage(name) {
         this.toLoad++;
         const img = new Image();
         const basePath = this.theme === 'modern' ? 'assets/images/' : 'assets/';
-        img.src = `${basePath}${name}`;
+        const path = `${basePath}${name}`;
+        img.src = this.getAssetUrl(path);
+
         img.onload = () => {
             this.loaded++;
             // console.log('Loaded', name);
@@ -33,9 +51,10 @@ export class Assets {
     }
 
     loadSound(name) {
-
         this.toLoad++;
-        const snd = new Audio(`assets/audio/${name}`);
+        const path = `assets/audio/${name}`;
+        const snd = new Audio(this.getAssetUrl(path));
+
         snd.onloadeddata = () => {
             this.loaded++;
         };
