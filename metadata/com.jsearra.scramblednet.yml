@@ -12,7 +12,7 @@ Repo: https://github.com/JSearra/ScrambledNet-Webapp.git
 Builds:
   - versionName: '1.0'
     versionCode: 1
-    commit: ea33674e9313a3d7add2dba51c02cb6d7db144f0
+    commit: 6f738a9d15024227ce206253c65c2763de421256
     subdir: android/app
     sudo:
       - curl -Lo node.tar.gz https://nodejs.org/download/release/v22.21.1/node-v22.21.1-linux-x64.tar.gz
