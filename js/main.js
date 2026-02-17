@@ -94,21 +94,56 @@ window.addEventListener('load', () => {
         settingsScreen.classList.add('hidden');
     });
 
+    // --- Settings Persistence ---
+    function loadSettings() {
+        try {
+            const stored = localStorage.getItem('scrambledNetSettings');
+            if (stored) {
+                const settings = JSON.parse(stored);
+                if (settings.theme) {
+                    game.assets.setTheme(settings.theme);
+                    updateThemeVisuals(settings.theme);
+                }
+                if (typeof settings.muted !== 'undefined') {
+                    game.assets.muted = settings.muted;
+                }
+            }
+        } catch (e) {
+            console.error('Failed to load settings', e);
+        }
+    }
+
+    function saveSettings() {
+        const settings = {
+            theme: game.assets.theme,
+            muted: game.assets.muted
+        };
+        try {
+            localStorage.setItem('scrambledNetSettings', JSON.stringify(settings));
+        } catch (e) {
+            console.error('Failed to save settings', e);
+        }
+    }
+
+    // Initialize
+    loadSettings();
+    showScreen(startScreen);
+
+    // --- Event Listeners Update ---
     soundToggle.addEventListener('change', (e) => {
         game.assets.muted = !e.target.checked;
+        saveSettings();
     });
 
     themeSelect.addEventListener('change', (e) => {
         const newTheme = e.target.value;
         if (newTheme !== game.assets.theme) {
             game.assets.setTheme(newTheme).then(() => {
-                // Trigger a re-render if the game is active or just generally
-                // If we are in the menu, it might not matter until we start.
-                // But if we are in-game, we want to see it instantly.
                 if (!gameScreen.classList.contains('hidden')) {
                     game.draw();
                 }
                 updateThemeVisuals(newTheme);
+                saveSettings(); // Save after successful theme set
                 console.log('Theme switched to', newTheme);
             });
         }
@@ -133,6 +168,6 @@ window.addEventListener('load', () => {
     });
 
     // Initialize
-    updateThemeVisuals(game.assets.theme);
+    loadSettings();
     showScreen(startScreen);
 });
