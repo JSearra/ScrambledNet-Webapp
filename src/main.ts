@@ -2,6 +2,13 @@ import '../style.scss';
 import emptyBg from '../assets/empty.png';
 import { Game } from './game.js';
 import { SKILL } from './constants.js';
+import { registerSW } from 'virtual:pwa-register';
+
+// Register PWA Service Worker
+registerSW({
+  onNeedRefresh() {},
+  onOfflineReady() {},
+});
 
 window.addEventListener('load', () => {
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;

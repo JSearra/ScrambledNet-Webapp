@@ -1,0 +1,1 @@
+{"name":"Scrambled Net","short_name":"ScrambledNet","description":"A puzzle game to connect the network","start_url":"./","display":"standalone","background_color":"#222222","theme_color":"#222222","lang":"en","scope":"./","icons":[{"src":"assets/logo.png","sizes":"192x192","type":"image/png"},{"src":"assets/logo.png","sizes":"512x512","type":"image/png"}]}
