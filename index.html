@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Scrambled Net</title>
     <title>Scrambled Net</title>
+    <link rel="icon" type="image/png" href="assets/logo.png">
 </head>
 
 <body>
@@ -19,6 +20,31 @@
             <button id="skill-insane" class="menu-btn">Insane</button>
             <button id="instructions-btn" class="menu-btn">Instructions</button>
             <button id="settings-btn" class="menu-btn">Settings</button>
+        </div>
+    </div>
+
+    <!-- In-Game Menu Modal -->
+    <div id="ingame-menu-screen" class="hidden modal-overlay">
+        <div class="modal-content">
+            <h2>Paused</h2>
+            
+            <div class="setting-row">
+                <label for="ingame-setting-sound">Sound Effects</label>
+                <input type="checkbox" id="ingame-setting-sound">
+            </div>
+
+            <div class="setting-row">
+                <label for="ingame-setting-theme">Theme</label>
+                <select id="ingame-setting-theme">
+                    <option value="retro">Retro</option>
+                    <option value="modern">Modern</option>
+                </select>
+            </div>
+
+            <div class="modal-actions" style="flex-direction: column; gap: 10px;">
+                <button id="ingame-resume-btn" class="menu-btn" style="width: 100%;">Resume</button>
+                <button id="ingame-quit-btn" class="menu-btn" style="width: 100%; background-color: #8b0000;">Main Menu</button>
+            </div>
         </div>
     </div>
 
@@ -116,7 +142,7 @@
             <button id="back-btn" class="control-btn">Menu</button>
         </div>
     </div>
-    <script type="module" src="js/main.js"></script>
+    <script type="module" src="src/main.ts"></script>
 </body>
 
 </html>
