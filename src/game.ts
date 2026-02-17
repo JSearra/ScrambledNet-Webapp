@@ -1,6 +1,7 @@
 import { Board } from './board.js';
 import { Assets } from './assets.js';
 import { getBoardSize } from './constants.js';
+import { Skill } from './types.js';
 
 export class Game {
     canvas: HTMLCanvasElement;
@@ -9,9 +10,10 @@ export class Game {
     board: Board;
     running: boolean;
     lastTime: number;
-    currentSkill: any; // Type for skill
+    currentSkill: Skill | null;
     moves: number;
     startTime: number;
+    selectedCell: { x: number; y: number } | null;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -23,6 +25,7 @@ export class Game {
         this.currentSkill = null;
         this.moves = 0;
         this.startTime = 0;
+        this.selectedCell = null;
 
 
         // Input handling
@@ -40,6 +43,9 @@ export class Game {
                 this.board.handleInput(x, y);
             }
         }, { passive: false });
+
+        // Keyboard controls
+        window.addEventListener('keydown', (e) => this.handleKeyboard(e));
     }
 
     stop() {
@@ -51,7 +57,7 @@ export class Game {
         return !this.assets.muted;
     }
 
-    async start(skill: any) {
+    async start(skill: Skill) {
         this.currentSkill = skill;
         this.running = false; // Stop current loop
 
@@ -110,7 +116,7 @@ export class Game {
         }
     }
 
-    handleInput(e: any) {
+    handleInput(e: MouseEvent) {
         const rect = this.canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
@@ -120,10 +126,49 @@ export class Game {
         }
     }
 
+    handleKeyboard(e: KeyboardEvent) {
+        if (!this.running || !this.board) return;
+
+        // Only handle game controls, not settings/menu
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Enter'].includes(e.key)) {
+            e.preventDefault();
+        }
+
+        // Initialize selection if null (center of board)
+        if (!this.selectedCell) {
+            this.selectedCell = {
+                x: Math.floor(this.board.gridWidth / 2),
+                y: Math.floor(this.board.gridHeight / 2)
+            };
+        }
+
+        // Arrow key navigation
+        if (e.key === 'ArrowUp') {
+            this.selectedCell.y = Math.max(0, this.selectedCell.y - 1);
+        } else if (e.key === 'ArrowDown') {
+            this.selectedCell.y = Math.min(this.board.gridHeight - 1, this.selectedCell.y + 1);
+        } else if (e.key === 'ArrowLeft') {
+            this.selectedCell.x = Math.max(0, this.selectedCell.x - 1);
+        } else if (e.key === 'ArrowRight') {
+            this.selectedCell.x = Math.min(this.board.gridWidth - 1, this.selectedCell.x + 1);
+        } else if (e.key === ' ' || e.key === 'Enter') {
+            // Rotate selected cell
+            const validMove = this.board.rotateCellAt(this.selectedCell.x, this.selectedCell.y);
+            if (validMove && this.running) {
+                this.moves++;
+            }
+        }
+    }
+
     draw() {
         this.ctx.fillStyle = '#000';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.board.draw(this.ctx);
+        
+        // Draw selection highlight
+        if (this.selectedCell && this.running) {
+            this.board.drawSelection(this.ctx, this.selectedCell.x, this.selectedCell.y);
+        }
     }
 
     loop(now: number) {

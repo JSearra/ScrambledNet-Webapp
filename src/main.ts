@@ -3,6 +3,20 @@ import emptyBg from '../assets/empty.png';
 import { Game } from './game.js';
 import { SKILL } from './constants.js';
 import { registerSW } from 'virtual:pwa-register';
+import { Skill } from './types.js';
+
+// PWA Install Prompt Handler
+let deferredPrompt: any = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show install button
+  const installBtn = document.getElementById('install-btn');
+  if (installBtn) {
+    installBtn.classList.remove('hidden');
+  }
+});
 
 // Register PWA Service Worker
 registerSW({
@@ -40,7 +54,7 @@ window.addEventListener('load', () => {
     }
 
     // Start Game Logic
-    function startGame(skill: any) {
+    function startGame(skill: Skill) {
         showScreen(gameScreen);
         uiOverlay.classList.add('hidden'); // Ensure overlay is hidden
         game.start(skill);
@@ -73,7 +87,9 @@ window.addEventListener('load', () => {
     // Win Screen Controls
     playAgainBtn!.addEventListener('click', () => {
         uiOverlay.classList.add('hidden');
-        game.start(game.currentSkill);
+        if (game.currentSkill) {
+            game.start(game.currentSkill);
+        }
     });
 
     // In-Game Menu Controls
@@ -148,6 +164,24 @@ window.addEventListener('load', () => {
     settingsCloseBtn!.addEventListener('click', () => {
         settingsScreen.classList.add('hidden');
     });
+
+    // PWA Install Button
+    const installBtn = document.getElementById('install-btn');
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            
+            deferredPrompt.prompt();
+            const choiceResult = await deferredPrompt.userChoice;
+            
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+            }
+            
+            deferredPrompt = null;
+            installBtn.classList.add('hidden');
+        });
+    }
 
     // --- Settings Persistence ---
     function loadSettings() {

@@ -1,5 +1,6 @@
 import { Cell, CellDirection, CARDINALS, REVERSE_DIRS } from './cell';
 import { Assets } from './assets';
+import { Skill } from './types.js';
 
 export class Board {
     assets: Assets;
@@ -83,7 +84,7 @@ export class Board {
         }
     }
 
-    setupBoard(skill: any, boardWidth: number, boardHeight: number) {
+    setupBoard(skill: Skill, boardWidth: number, boardHeight: number) {
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
         this.boardStartX = Math.floor((this.gridWidth - this.boardWidth) / 2);
@@ -149,7 +150,7 @@ export class Board {
         return val;
     }
 
-    createNet(skill: any) {
+    createNet(skill: Skill) {
         // Reset
         for (let x = this.boardStartX; x < this.boardEndX; x++) {
             for (let y = this.boardStartY; y < this.boardEndY; y++) {
@@ -325,5 +326,38 @@ export class Board {
         }
         this.updateConnections();
         return "Solved!";
+    }
+
+    rotateCellAt(x: number, y: number): boolean {
+        if (x < 0 || x >= this.gridWidth || y < 0 || y >= this.gridHeight) {
+            return false;
+        }
+        const cell = this.cellMatrix[x][y];
+        if (cell.connectedDirs === CellDirection.NONE) {
+            return false;
+        }
+        cell.rotate(90, 250); // 90 degree rotation, 250ms animation
+        this.updateConnections();
+        return true;
+    }
+
+    drawSelection(ctx: CanvasRenderingContext2D, x: number, y: number) {
+        if (x < 0 || x >= this.gridWidth || y < 0 || y >= this.gridHeight) {
+            return;
+        }
+        const cell = this.cellMatrix[x][y];
+        if (cell.connectedDirs === CellDirection.NONE) {
+            return;
+        }
+        
+        // Draw a highlight border around the selected cell
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(
+            cell.cellLeft | 0,
+            cell.cellTop | 0,
+            cell.cellWidth | 0,
+            cell.cellHeight | 0
+        );
     }
 }

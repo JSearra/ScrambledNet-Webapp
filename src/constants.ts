@@ -1,3 +1,5 @@
+import { Skill } from './types.js';
+
 export const CONSTANTS = {
     CELL_MIN: 40,
     CELL_MAX: 128,
@@ -8,7 +10,7 @@ export const CONSTANTS = {
     ROTATE_DFLT_TIME: 250,
 };
 
-export const SKILL = {
+export const SKILL: Record<string, Skill> = {
     NOVICE: { label: 'Novice', branches: 2, wrapped: false, blind: 9 },
     NORMAL: { label: 'Normal', branches: 2, wrapped: false, blind: 9 },
     EXPERT: { label: 'Expert', branches: 2, wrapped: false, blind: 9 },
