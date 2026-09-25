@@ -116,8 +116,9 @@ export class Board {
             }
         }
 
-        // Generate Net
-        this.createNet(skill);
+        // Generate Net, retrying until it covers at least 85% of the board
+        const minCells = Math.floor(this.boardWidth * this.boardHeight * 0.85);
+        for (let tries = 0; tries < 10 && this.createNet(skill) < minCells; tries++);
 
         // Save Solution State
         for (let x = this.boardStartX; x < this.boardEndX; x++) {
@@ -150,8 +151,11 @@ export class Board {
         return val;
     }
 
+    // Port of the Java createNet(): each cell gets a single turn to grow 1-2 branches
+    // (a third is possible when skill.branches >= 3), or is sent to the back of the queue.
+    // This caps the connections per cell by skill and leaves some cells empty.
+    // Returns the number of cells in the net.
     createNet(skill: Skill) {
-        // Reset
         for (let x = this.boardStartX; x < this.boardEndX; x++) {
             for (let y = this.boardStartY; y < this.boardEndY; y++) {
                 this.cellMatrix[x][y].setDirs(CellDirection.FREE);
@@ -159,55 +163,51 @@ export class Board {
             }
         }
 
-        // Root
         const rootX = Math.floor(Math.random() * this.boardWidth) + this.boardStartX;
         const rootY = Math.floor(Math.random() * this.boardHeight) + this.boardStartY;
         this.rootCell = this.cellMatrix[rootX][rootY];
         this.rootCell.isConnected = true;
         this.rootCell.isRoot = true;
 
-        // Active list of cells that are part of the net and might have free neighbors
-        let list = [this.rootCell];
+        const list = [this.rootCell];
+        if (Math.random() < 0.5) this.addRandomDir(list);
 
         while (list.length > 0) {
-            // Selection Strategy:
-            // "Last" (Index = list.length-1) -> Recursive Backtracker (DFS) -> Long winding paths ("Rivers").
-            // "Random" -> Prim's Algorithm -> Many short branches ("Blob").
-            // We mix them based on desired 'branchiness'.
-
-            // High branches (Master/Insane) -> More Randomness to create difficult branching.
-            // Low branches (Novice/Normal) -> More DFS for easier flowing paths.
-
-            const dfsProb = (skill.branches >= 3) ? 0.5 : 0.8;
-
-            let index;
-            if (Math.random() < dfsProb) {
-                index = list.length - 1;
+            if (Math.random() < 0.5) {
+                this.addRandomDir(list);
+                if (Math.random() < 0.5) this.addRandomDir(list);
+                if (skill.branches >= 3 && Math.floor(Math.random() * 3) === 0) this.addRandomDir(list);
             } else {
-                index = Math.floor(Math.random() * list.length);
+                list.push(list[0]);
             }
+            list.shift();
+        }
 
-            const cell = list[index];
-            const freeNeighbours = [];
-
-            for (const d of CARDINALS) {
-                const ucell = cell.next(d);
-                if (ucell && ucell.connectedDirs === CellDirection.FREE) {
-                    freeNeighbours.push({ dir: d, cell: ucell });
-                }
-            }
-
-            if (freeNeighbours.length === 0) {
-                list.splice(index, 1);
-            } else {
-                const pick = freeNeighbours[Math.floor(Math.random() * freeNeighbours.length)];
-
-                cell.addDir(pick.dir);
-                pick.cell.addDir(REVERSE_DIRS[pick.dir]);
-
-                list.push(pick.cell);
+        let cells = 0;
+        for (let x = this.boardStartX; x < this.boardEndX; x++) {
+            for (let y = this.boardStartY; y < this.boardEndY; y++) {
+                if (this.cellMatrix[x][y].connectedDirs !== CellDirection.FREE) cells++;
             }
         }
+        return cells;
+    }
+
+    // Link the cell at the head of the list to a random free neighbour, and queue that neighbour.
+    addRandomDir(list: Cell[]) {
+        const cell = list[0];
+        const freeNeighbours = [];
+        for (const d of CARDINALS) {
+            const ucell = cell.next(d);
+            if (ucell && ucell.connectedDirs === CellDirection.FREE) {
+                freeNeighbours.push({ dir: d, cell: ucell });
+            }
+        }
+        if (freeNeighbours.length === 0) return;
+
+        const pick = freeNeighbours[Math.floor(Math.random() * freeNeighbours.length)];
+        cell.addDir(pick.dir);
+        pick.cell.addDir(REVERSE_DIRS[pick.dir]);
+        list.push(pick.cell);
     }
 
     updateConnections() {

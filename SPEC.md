@@ -13,7 +13,7 @@ where the port has drifted, and fix the port's own bugs. The UI, themes and buil
 1. **Net generation respects `skill.branches`** (Java `createNet` / `addRandomDir`).
    Each cell gets one turn to grow 1–2 branches (3 when `branches >= 3`), so non-root cells on
    Novice/Normal/Expert never become 4-way crosses. The net is still a single tree rooted at the
-   server. Regenerate up to 10 times until at least 85% of cells are used, keeping the best attempt.
+   server. Regenerate up to 10 times until at least 85% of cells are used (as Java does; in practice the average fill is ~99%).
 2. **Scrambling is immediate and uniform.** After `setupBoard` no cell is mid-rotation, each cell
    is one of the 4 rotations of its solution, and connection state is correct before the first frame.
    (Right now a zero-duration animation is used, which divides by zero and never produces 180°.)
