@@ -18,4 +18,4 @@
     long-press and `L` wired up.
 - [x] **T7 Rotation clock clamp** (SPEC R6). Depends: T1.
   - Accept: `doUpdate` with `now < rotateStart` gives angle 0, not negative.
-- [ ] **T8 Browser verification** with `npm run dev`.
+- [x] **T8 Browser verification** with `npm run dev`.
