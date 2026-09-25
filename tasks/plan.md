@@ -16,6 +16,6 @@
 - [x] **T6 Lock toggle** (SPEC R5). Depends: T5.
   - Accept: toggleLock flips `isLocked` for cable cells only; locked cells refuse rotation; right-click,
     long-press and `L` wired up.
-- [ ] **T7 Rotation clock clamp** (SPEC R6). Depends: T1.
+- [x] **T7 Rotation clock clamp** (SPEC R6). Depends: T1.
   - Accept: `doUpdate` with `now < rotateStart` gives angle 0, not negative.
 - [ ] **T8 Browser verification** with `npm run dev`.

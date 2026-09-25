@@ -207,7 +207,9 @@ export class Cell {
         let changed = false;
 
         if (this.rotateTarget !== 0) {
-            this.rotateAngle = ((now - this.rotateStart) / this.rotateTime) * 90;
+            // rAF timestamps can be slightly earlier than the performance.now() taken in rotate()
+            const elapsed = Math.max(0, now - this.rotateStart);
+            this.rotateAngle = (elapsed / this.rotateTime) * 90;
             if (this.rotateTarget < 0) this.rotateAngle = -this.rotateAngle;
 
             if (Math.abs(this.rotateAngle) >= 90) {
