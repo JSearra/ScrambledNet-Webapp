@@ -13,7 +13,7 @@
 - [x] **T5 Unified rotate + move counting** (SPEC R4). Depends: T1.
   - Accept: FREE/NONE/locked cells don't rotate; mouse/touch/keyboard share one path; repeat tap on the
     same cell doesn't add a move; touch counts moves.
-- [ ] **T6 Lock toggle** (SPEC R5). Depends: T5.
+- [x] **T6 Lock toggle** (SPEC R5). Depends: T5.
   - Accept: toggleLock flips `isLocked` for cable cells only; locked cells refuse rotation; right-click,
     long-press and `L` wired up.
 - [ ] **T7 Rotation clock clamp** (SPEC R6). Depends: T1.

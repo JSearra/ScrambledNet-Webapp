@@ -359,6 +359,28 @@ export class Board {
         return this.rotateCell(this.cellMatrix[x][y]);
     }
 
+    // Lock a cable cell so it can't be rotated by accident (Java long press).
+    toggleLock(cell: Cell): boolean {
+        if (cell.connectedDirs === CellDirection.NONE || cell.connectedDirs === CellDirection.FREE) {
+            return false;
+        }
+        cell.isLocked = !cell.isLocked;
+        this.assets.playSound('click.ogg');
+        return true;
+    }
+
+    toggleLockAt(x: number, y: number): boolean {
+        if (x < 0 || x >= this.gridWidth || y < 0 || y >= this.gridHeight) {
+            return false;
+        }
+        return this.toggleLock(this.cellMatrix[x][y]);
+    }
+
+    lockAtPixel(x: number, y: number): boolean {
+        const cell = this.cellAtPixel(x, y);
+        return cell ? this.toggleLock(cell) : false;
+    }
+
     drawSelection(ctx: CanvasRenderingContext2D, x: number, y: number) {
         if (x < 0 || x >= this.gridWidth || y < 0 || y >= this.gridHeight) {
             return;

@@ -3,6 +3,8 @@ import { Assets } from './assets.js';
 import { getBoardSize } from './constants.js';
 import { Skill } from './types.js';
 
+const LONG_PRESS_TIME = 500;
+
 export class Game {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D; // or null? "!" assertion if we are sure.
@@ -28,15 +30,38 @@ export class Game {
 
         // Input handling
         // Handle both mouse and touch
-        this.canvas.addEventListener('mousedown', (e) => this.handleInput(e.clientX, e.clientY));
+        // Left click rotates, right click toggles the lock
+        this.canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 0) this.handleInput(e.clientX, e.clientY);
+        });
+        this.canvas.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            this.handleInput(e.clientX, e.clientY, true);
+        });
+
+        // Tap rotates on release, a long press toggles the lock instead
+        let longPressTimer: number | undefined;
+        let longPressed = false;
         this.canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Prevent scrolling
-            // Use the first touch point
-            if (e.changedTouches.length > 0) {
+            e.preventDefault(); // Prevent scrolling and emulated mouse events
+            if (e.changedTouches.length === 0) return;
+            const touch = e.changedTouches[0];
+            longPressed = false;
+            clearTimeout(longPressTimer);
+            longPressTimer = window.setTimeout(() => {
+                longPressed = true;
+                this.handleInput(touch.clientX, touch.clientY, true);
+            }, LONG_PRESS_TIME);
+        }, { passive: false });
+        this.canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            clearTimeout(longPressTimer);
+            if (!longPressed && e.changedTouches.length > 0) {
                 const touch = e.changedTouches[0];
                 this.handleInput(touch.clientX, touch.clientY);
             }
         }, { passive: false });
+        this.canvas.addEventListener('touchcancel', () => clearTimeout(longPressTimer));
 
         // Keyboard controls
         window.addEventListener('keydown', (e) => this.handleKeyboard(e));
@@ -109,10 +134,13 @@ export class Game {
         }
     }
 
-    handleInput(clientX: number, clientY: number) {
+    handleInput(clientX: number, clientY: number, lock = false) {
         if (!this.running) return;
         const rect = this.canvas.getBoundingClientRect();
-        this.board.handleInput(clientX - rect.left, clientY - rect.top);
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+        if (lock) this.board.lockAtPixel(x, y);
+        else this.board.handleInput(x, y);
     }
 
     handleKeyboard(e: KeyboardEvent) {
@@ -142,6 +170,8 @@ export class Game {
             this.selectedCell.x = Math.min(this.board.gridWidth - 1, this.selectedCell.x + 1);
         } else if (e.key === ' ' || e.key === 'Enter') {
             this.board.rotateCellAt(this.selectedCell.x, this.selectedCell.y);
+        } else if (e.key === 'l' || e.key === 'L') {
+            this.board.toggleLockAt(this.selectedCell.x, this.selectedCell.y);
         }
     }
 
