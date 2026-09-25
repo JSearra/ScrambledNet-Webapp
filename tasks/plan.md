@@ -24,7 +24,7 @@
 - [x] **T10 Animated auto-solve** (SPEC R8). Depends: T5.
   - Accept: solving a scrambled board ends in a WIN without changing `moves`; locked and blind cells get
     fixed; input is refused while solving; stopping clears the queue; "Solve" button in the menu.
-- [ ] **T11 Data blips** (SPEC R9). Depends: T1.
+- [x] **T11 Data blips** (SPEC R9). Depends: T1.
   - Accept: blips spread from the root along connected cables only, stop at gaps, get cleared by
     rotation; they're drawn every frame in both themes.
 - [ ] **T12 Browser verification**: blips, solver, sounds loading, touch taps counting moves.

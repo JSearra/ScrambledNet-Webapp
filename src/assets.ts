@@ -1,3 +1,4 @@
+import { BLIP_SPRITES } from './cell';
 // Use Vite's glob import to get all assets with their hashed URLs
 const assetFiles = import.meta.glob('../assets/**/*', { eager: true, query: '?url', import: 'default' });
 
@@ -39,10 +40,9 @@ export class Assets {
         return url;
     }
 
-    loadImage(name: string) {
+    loadImage(name: string, basePath = this.theme === 'modern' ? 'assets/images/' : 'assets/') {
         this.toLoad++;
         const img = new Image();
-        const basePath = this.theme === 'modern' ? 'assets/images/' : 'assets/';
         const path = `${basePath}${name}`;
         img.src = this.getAssetUrl(path) as string;
 
@@ -94,6 +94,8 @@ export class Assets {
 
 
         imageFiles.forEach(f => this.loadImage(f));
+        // Data blip sprites only exist in the modern set; both themes use them
+        BLIP_SPRITES.forEach(f => this.loadImage(f, 'assets/images/'));
 
 
         if (Object.keys(this.sounds).length === 0) {

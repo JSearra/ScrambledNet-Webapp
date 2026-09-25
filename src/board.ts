@@ -20,6 +20,9 @@ export class Board {
     lastSolveStep: number;
     solverUsed: boolean;
 
+    blipCount: number;
+    blipsLastAdvance: number;
+
     boardWidth: number;
     boardHeight: number;
     boardStartX: number;
@@ -46,6 +49,8 @@ export class Board {
         this.solvingCell = null;
         this.lastSolveStep = 0;
         this.solverUsed = false;
+        this.blipCount = 0;
+        this.blipsLastAdvance = 0;
 
         // Board layout within the grid
         this.boardWidth = 0;
@@ -112,6 +117,8 @@ export class Board {
         this.lastRotatedCell = null;
         this.stopSolve();
         this.solverUsed = false;
+        this.blipCount = 0;
+        this.blipsLastAdvance = 0;
 
         for (let x = 0; x < this.gridWidth; x++) {
             for (let y = 0; y < this.gridHeight; y++) {
@@ -336,6 +343,8 @@ export class Board {
             }
         }
 
+        this.updateBlips(now);
+
         if (changed) {
             const connected = this.updateConnections();
             if (this.isSolved()) {
@@ -360,6 +369,18 @@ export class Board {
         for (const column of this.cellMatrix) {
             for (const cell of column) cell.isBlind = false;
         }
+    }
+
+    updateBlips(now: number) {
+        if (now - this.blipsLastAdvance < CONSTANTS.BLIPS_TIME) return;
+        for (const column of this.cellMatrix) {
+            for (const cell of column) cell.advanceBlips(this.blipCount);
+        }
+        this.blipCount++;
+        for (const column of this.cellMatrix) {
+            for (const cell of column) cell.transferBlips();
+        }
+        this.blipsLastAdvance = now;
     }
 
     isSolving() {
@@ -455,6 +476,13 @@ export class Board {
     lockAtPixel(x: number, y: number): boolean {
         const cell = this.cellAtPixel(x, y);
         return cell ? this.toggleLock(cell) : false;
+    }
+
+    drawBlips(ctx: CanvasRenderingContext2D, now: number) {
+        const frac = Math.min(1, Math.max(0, (now - this.blipsLastAdvance) / CONSTANTS.BLIPS_TIME));
+        for (const column of this.cellMatrix) {
+            for (const cell of column) cell.drawBlips(ctx, frac);
+        }
     }
 
     drawSelection(ctx: CanvasRenderingContext2D, x: number, y: number) {

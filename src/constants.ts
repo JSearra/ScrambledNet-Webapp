@@ -8,6 +8,8 @@ export const CONSTANTS = {
     SOLVE_ROTATE_TIME: 250,
     HIGHLIGHT_TIME: 500,
     ROTATE_DFLT_TIME: 250,
+    BLIPS_TIME: 300, // Time a data blip takes to cross half a cell
+    BLIPS_EVERY: 6, // The server sends out new blips every this many steps
 };
 
 export const SKILL: Record<string, Skill> = {

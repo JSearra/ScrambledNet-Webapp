@@ -1,5 +1,6 @@
 
 import { Assets } from './assets';
+import { CONSTANTS } from './constants';
 
 export const CellDirection = {
     FREE: 0,
@@ -46,6 +47,20 @@ export const CARDINALS = [
     CellDirection.U___
 ];
 
+// Unit offsets of each cardinal direction, for drawing blips along a cable
+const DIR_OFFSETS: Record<number, [number, number]> = {
+    [CellDirection.___L]: [-1, 0],
+    [CellDirection.__D_]: [0, 1],
+    [CellDirection._R__]: [1, 0],
+    [CellDirection.U___]: [0, -1]
+};
+
+// Sprites for data blips: on connected cables, on disconnected (grey) cables, and the server glow
+const BLIP_IMAGES = ['blob_14', 'blob_15', 'blob_16', 'blob_17', 'blob_18', 'blob_19', 'blob_20'];
+const BLIP_G_IMAGES = BLIP_IMAGES.map(n => n.replace('blob_', 'blob_g_'));
+const BLIP_T_IMAGES = ['blip_t01', 'blip_t03', 'blip_t05', 'blip_t07', 'blip_t08', 'blip_t09', 'blip_t10'];
+export const BLIP_SPRITES = [...BLIP_IMAGES, ...BLIP_G_IMAGES, ...BLIP_T_IMAGES].map(n => `${n}.png`);
+
 export const REVERSE_DIRS = {
     [CellDirection.U___]: CellDirection.__D_,
     [CellDirection._R__]: CellDirection.___L,
@@ -74,6 +89,11 @@ export class Cell {
     isBlind: boolean;
 
     solutionDirs: number;
+
+    // Data blips, as direction bitmasks: arriving from, leaving towards, and handing on to the next cell
+    blipsIncoming: number;
+    blipsOutgoing: number;
+    blipsTransfer: number;
 
     rotateTarget: number;
     rotateStart: number;
@@ -104,6 +124,10 @@ export class Cell {
 
         this.solutionDirs = CellDirection.NONE;
 
+        this.blipsIncoming = 0;
+        this.blipsOutgoing = 0;
+        this.blipsTransfer = 0;
+
         this.rotateTarget = 0;
         this.rotateStart = 0;
         this.rotateAngle = 0;
@@ -128,6 +152,7 @@ export class Cell {
         this.isLocked = false;
         this.isBlind = false;
         this.solutionDirs = CellDirection.NONE;
+        this.clearBlips();
         this.rotateTarget = 0;
         this.rotateAngle = 0;
     }
@@ -209,6 +234,50 @@ export class Cell {
             this.rotateTime = time;
         }
         this.rotateTarget += angle;
+        this.clearBlips();
+    }
+
+    clearBlips() {
+        this.blipsIncoming = 0;
+        this.blipsOutgoing = 0;
+        this.blipsTransfer = 0;
+    }
+
+    // Accept a blip arriving from direction d, if we have a cable that way.
+    setBlip(dir: number) {
+        if (this.hasConnection(dir)) this.blipsIncoming |= dir;
+    }
+
+    // Move every blip on by half a cell (port of the Java advanceBlips()). Outgoing blips at the
+    // cell edge get queued for transfer; incoming blips reaching the centre leave by every other
+    // connected side. The server sends new blips down all its cables every BLIPS_EVERY steps.
+    advanceBlips(count: number) {
+        this.blipsTransfer = 0;
+        for (const d of CARDINALS) {
+            if ((this.blipsOutgoing & d) !== 0 && this.hasConnection(d)) this.blipsTransfer |= d;
+        }
+        this.blipsOutgoing = 0;
+
+        if (this.blipsIncoming !== 0) {
+            for (const d of CARDINALS) {
+                if ((this.blipsIncoming & d) === 0 && this.hasConnection(d)) this.blipsOutgoing |= d;
+            }
+        }
+        this.blipsIncoming = 0;
+
+        if (this.isRoot && count % CONSTANTS.BLIPS_EVERY === 0) {
+            for (const d of CARDINALS) {
+                if (this.hasConnection(d)) this.blipsOutgoing |= d;
+            }
+        }
+    }
+
+    // Hand blips queued by advanceBlips() over to the neighbouring cells.
+    transferBlips() {
+        for (const d of CARDINALS) {
+            if ((this.blipsTransfer & d) !== 0) this.next(d)?.setBlip(REVERSE_DIRS[d]);
+        }
+        this.blipsTransfer = 0;
     }
 
     doUpdate(now: number) {
@@ -302,5 +371,57 @@ export class Cell {
         // We are done drawing, restore() comes next.
 
         ctx.restore();
+    }
+
+    // Draw this cell's data blips (port of the Java doDrawBlips()). This is a separate pass after
+    // all cells are drawn, so blips crossing into a neighbour aren't painted over.
+    // frac is how far (0-1) the blips are through their current half-cell step.
+    drawBlips(ctx: CanvasRenderingContext2D, frac: number) {
+        if (this.isBlind) return;
+        const n = this.numDirs();
+        // Blips run down the cable into a terminal, then light up its screen
+        if (this.isRoot || n > 1 || (n === 1 && frac < 0.3)) this.drawBlipSprites(ctx, frac);
+        else if (n === 1) this.drawTerminalData(ctx);
+    }
+
+    drawBlipSprites(ctx: CanvasRenderingContext2D, frac: number) {
+        if (this.blipsIncoming === 0 && this.blipsOutgoing === 0) return;
+        const names = this.isRoot ? BLIP_T_IMAGES : this.isConnected ? BLIP_IMAGES : BLIP_G_IMAGES;
+        const last = names.length - 1;
+        // Incoming blips grow as they reach the centre, outgoing ones shrink as they leave
+        const imgIn = this.assets.getImage(`${names[Math.round(last * frac)]}.png`);
+        const imgOut = this.assets.getImage(`${names[Math.round(last * (1 - frac))]}.png`);
+        const w = this.cellWidth;
+        const h = this.cellHeight;
+
+        for (const d of CARDINALS) {
+            const [dx, dy] = DIR_OFFSETS[d];
+            if ((this.blipsIncoming & d) !== 0 && imgIn) {
+                const p = (1 - frac) * w / 2;
+                ctx.drawImage(imgIn, this.cellLeft + dx * p, this.cellTop + dy * p, w, h);
+            }
+            if ((this.blipsOutgoing & d) !== 0 && imgOut) {
+                const p = frac * w / 2;
+                ctx.drawImage(imgOut, this.cellLeft + dx * p, this.cellTop + dy * p, w, h);
+            }
+        }
+    }
+
+    // Flicker green "data" lines on a terminal's screen while a blip is arriving.
+    drawTerminalData(ctx: CanvasRenderingContext2D) {
+        if (!this.isConnected || this.blipsIncoming === 0) return;
+        const w = this.cellWidth;
+        const h = this.cellHeight;
+        const step = Math.max(2, h / 32);
+        ctx.strokeStyle = '#00ff00';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let y = h / 3; y < h * 0.55; y += step) {
+            const l = w / 3;
+            const r = w / 3 * Math.random() + w / 3;
+            ctx.moveTo(this.cellLeft + l, this.cellTop + y);
+            ctx.lineTo(this.cellLeft + r, this.cellTop + y);
+        }
+        ctx.stroke();
     }
 }

@@ -181,10 +181,11 @@ export class Game {
         }
     }
 
-    draw() {
+    draw(now = performance.now()) {
         this.ctx.fillStyle = '#000';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.board.draw(this.ctx);
+        this.board.drawBlips(this.ctx, now);
         
         // Draw selection highlight, or the cell the auto-solver is working on
         const solving = this.board.solvingCell;
@@ -203,7 +204,7 @@ export class Game {
 
         const result = this.board.update(now);
 
-        this.draw();
+        this.draw(now);
 
         // Update Stats
         const currentTime = Date.now();
