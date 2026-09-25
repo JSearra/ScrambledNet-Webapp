@@ -1,0 +1,8 @@
+- Data blips now flow from the server through the connected network
+- Auto-solve from the pause menu
+- Lock tiles with a long press (or right-click / L key)
+- Insane mode hides 3- and 4-way tiles until solved
+- Puzzles are generated like the original: fewer branches on easier levels
+- Full sound set: turn, connect, lock and start sounds
+- Fixed: taps on touch screens not counting moves
+- Fixed: rotations could be lost when the game stuttered
