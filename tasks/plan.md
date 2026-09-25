@@ -19,7 +19,7 @@
 - [x] **T7 Rotation clock clamp** (SPEC R6). Depends: T1.
   - Accept: `doUpdate` with `now < rotateStart` gives angle 0, not negative.
 - [x] **T8 Browser verification** with `npm run dev`.
-- [ ] **T9 Sounds** (SPEC R7). Depends: T5, T6.
+- [x] **T9 Sounds** (SPEC R7). Depends: T5, T6.
   - Accept: tests record the right sound for each event; all six sounds are loaded.
 - [ ] **T10 Animated auto-solve** (SPEC R8). Depends: T5.
   - Accept: solving a scrambled board ends in a WIN without changing `moves`; locked and blind cells get

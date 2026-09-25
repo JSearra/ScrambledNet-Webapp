@@ -245,11 +245,16 @@ export class Board {
             }
         }
 
+        // Count cells that just joined the network, so the caller can play the connect sound
+        let newConnections = 0;
         for (let x = 0; x < this.gridWidth; x++) {
             for (let y = 0; y < this.gridHeight; y++) {
-                this.cellMatrix[x][y].isConnected = this.isConnected[x][y];
+                const cell = this.cellMatrix[x][y];
+                if (this.isConnected[x][y] && !cell.isConnected) newConnections++;
+                cell.isConnected = this.isConnected[x][y];
             }
         }
+        return newConnections > 0;
     }
 
     hasNewConnection(cell: Cell, dir: number) {
@@ -292,10 +297,11 @@ export class Board {
         if (cell.connectedDirs === CellDirection.NONE ||
             cell.connectedDirs === CellDirection.FREE ||
             cell.isLocked) {
+            this.assets.playSound('click.ogg');
             return false;
         }
         cell.rotate(90, 250);
-        this.assets.playSound('click.ogg');
+        this.assets.playSound('turn.ogg');
         if (cell !== this.lastRotatedCell) {
             this.moves++;
             this.lastRotatedCell = cell;
@@ -315,11 +321,12 @@ export class Board {
         }
 
         if (changed) {
-            this.updateConnections();
+            const connected = this.updateConnections();
             if (this.isSolved()) {
                 this.revealBlind();
                 return 'WIN';
             }
+            if (connected) this.assets.playSound('connect.ogg');
         }
         return null;
     }
@@ -362,10 +369,11 @@ export class Board {
     // Lock a cable cell so it can't be rotated by accident (Java long press).
     toggleLock(cell: Cell): boolean {
         if (cell.connectedDirs === CellDirection.NONE || cell.connectedDirs === CellDirection.FREE) {
+            this.assets.playSound('click.ogg');
             return false;
         }
         cell.isLocked = !cell.isLocked;
-        this.assets.playSound('click.ogg');
+        this.assets.playSound('pop.wav');
         return true;
     }
 

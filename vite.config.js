@@ -34,7 +34,7 @@ export default defineConfig({
                 ]
             },
             workbox: {
-                globPatterns: ['**/*.{js,css,html,png,jpg,svg,json,ogg}'],
+                globPatterns: ['**/*.{js,css,html,png,jpg,svg,json,ogg,wav}'],
                 runtimeCaching: [
                     {
                         urlPattern: ({ request }) => request.destination === 'image',

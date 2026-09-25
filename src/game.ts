@@ -118,6 +118,7 @@ export class Game {
         this.board.setupBoard(skill, size.width, size.height);
 
         this.running = true;
+        this.assets.playSound('start.ogg');
         this.lastTime = performance.now();
         requestAnimationFrame((t) => this.loop(t));
 

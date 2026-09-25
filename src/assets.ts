@@ -98,7 +98,7 @@ export class Assets {
 
         if (Object.keys(this.sounds).length === 0) {
             const soundFiles = [
-                'click.ogg', 'win.ogg'
+                'start.ogg', 'click.ogg', 'turn.ogg', 'connect.ogg', 'pop.wav', 'win.ogg'
             ];
             soundFiles.forEach(f => this.loadSound(f));
         }
