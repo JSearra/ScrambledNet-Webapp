@@ -53,6 +53,14 @@ export const REVERSE_DIRS = {
     [CellDirection.___L]: CellDirection._R__
 };
 
+// Turn a direction bitmask clockwise by the given number of quarter turns (negative = anticlockwise).
+export function turnDirs(bits: number, quarters: number) {
+    for (let i = ((quarters % 4) + 4) % 4; i > 0; i--) {
+        bits = ((bits & 0x01) << 3) | ((bits & 0x0e) >> 1);
+    }
+    return bits;
+}
+
 export class Cell {
     xindex: number;
     yindex: number;
@@ -194,9 +202,9 @@ export class Cell {
         this.connectedDirs = dir;
     }
 
-    rotate(angle: number, time: number) {
+    rotate(angle: number, time: number, now = performance.now()) {
         if (this.rotateTarget === 0) {
-            this.rotateStart = performance.now(); // different from System.currentTimeMillis()
+            this.rotateStart = now;
             this.rotateAngle = 0;
             this.rotateTime = time;
         }

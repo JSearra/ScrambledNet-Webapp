@@ -43,6 +43,7 @@ window.addEventListener('load', () => {
     const ingameMenuScreen = document.getElementById('ingame-menu-screen')!;
     const resumeBtn = document.getElementById('ingame-resume-btn')!;
     const quitBtn = document.getElementById('ingame-quit-btn')!;
+    const solveBtn = document.getElementById('ingame-solve-btn')!;
     const ingameSoundToggle = document.getElementById('ingame-setting-sound') as HTMLInputElement;
     const ingameThemeSelect = document.getElementById('ingame-setting-theme') as HTMLSelectElement;
 
@@ -79,10 +80,18 @@ window.addEventListener('load', () => {
     document.getElementById('skill-insane')!.addEventListener('click', () => startGame(SKILL.INSANE));
 
     // Game Controls (The "Menu" button during gameplay)
-    backBtn!.addEventListener('click', () => {
-        // Show in-game menu instead of quitting immediately
+    // Show in-game menu instead of quitting immediately
+    function openIngameMenu() {
         ingameMenuScreen.classList.remove('hidden');
-    });
+
+        // Sync In-Game UI with current state
+        solveBtn.classList.toggle('hidden', !game.running);
+        solveBtn.innerText = game.board.isSolving() ? 'Stop Solving' : 'Solve';
+        ingameSoundToggle.checked = !game.assets.muted;
+        ingameThemeSelect.value = game.assets.theme;
+    }
+
+    backBtn!.addEventListener('click', openIngameMenu);
 
     // Win Screen Controls
     playAgainBtn!.addEventListener('click', () => {
@@ -95,17 +104,15 @@ window.addEventListener('load', () => {
     // In-Game Menu Controls
     // In-Game Menu Controls (moved up)
 
-    menuBtn!.addEventListener('click', () => {
-        // Show in-game menu instead of quitting immediately
-        ingameMenuScreen.classList.remove('hidden');
-
-        // Sync In-Game UI with current state
-        ingameSoundToggle.checked = !game.assets.muted;
-        ingameThemeSelect.value = game.assets.theme;
-    });
+    menuBtn!.addEventListener('click', openIngameMenu);
 
     resumeBtn.addEventListener('click', () => {
         ingameMenuScreen.classList.add('hidden');
+    });
+
+    solveBtn.addEventListener('click', () => {
+        ingameMenuScreen.classList.add('hidden');
+        game.toggleSolve();
     });
 
     // In-Game Settings Listeners

@@ -1,6 +1,7 @@
-import { Cell, CellDirection, CARDINALS, REVERSE_DIRS } from './cell';
+import { Cell, CellDirection, CARDINALS, REVERSE_DIRS, turnDirs } from './cell';
 import { Assets } from './assets';
 import { Skill } from './types.js';
+import { CONSTANTS } from './constants';
 
 export class Board {
     assets: Assets;
@@ -12,6 +13,12 @@ export class Board {
     connectingCells: Cell[];
     moves: number;
     lastRotatedCell: Cell | null;
+
+    // Auto-solver state: queued quarter turns, and the cell currently being worked on
+    solveMoves: { cell: Cell; angle: number }[] | null;
+    solvingCell: Cell | null;
+    lastSolveStep: number;
+    solverUsed: boolean;
 
     boardWidth: number;
     boardHeight: number;
@@ -35,6 +42,10 @@ export class Board {
         this.connectingCells = [];
         this.moves = 0;
         this.lastRotatedCell = null;
+        this.solveMoves = null;
+        this.solvingCell = null;
+        this.lastSolveStep = 0;
+        this.solverUsed = false;
 
         // Board layout within the grid
         this.boardWidth = 0;
@@ -99,6 +110,8 @@ export class Board {
         const wrap = skill.wrapped;
         this.moves = 0;
         this.lastRotatedCell = null;
+        this.stopSolve();
+        this.solverUsed = false;
 
         for (let x = 0; x < this.gridWidth; x++) {
             for (let y = 0; y < this.gridHeight; y++) {
@@ -294,6 +307,7 @@ export class Board {
     // Rotate a cell clockwise. Repeat taps on the same cell count as a single move,
     // since tapping only turns one way (as in the Java cellClicked()).
     rotateCell(cell: Cell): boolean {
+        if (this.isSolving()) return false;
         if (cell.connectedDirs === CellDirection.NONE ||
             cell.connectedDirs === CellDirection.FREE ||
             cell.isLocked) {
@@ -311,6 +325,8 @@ export class Board {
     }
 
     update(now: number) {
+        this.stepSolver(now);
+
         let changed = false;
         for (let x = 0; x < this.gridWidth; ++x) {
             for (let y = 0; y < this.gridHeight; ++y) {
@@ -324,6 +340,7 @@ export class Board {
             const connected = this.updateConnections();
             if (this.isSolved()) {
                 this.revealBlind();
+                this.stopSolve();
                 return 'WIN';
             }
             if (connected) this.assets.playSound('connect.ogg');
@@ -345,18 +362,68 @@ export class Board {
         }
     }
 
-    autoSolve() {
-        this.revealBlind();
-        for (let x = this.boardStartX; x < this.boardEndX; x++) {
-            for (let y = this.boardStartY; y < this.boardEndY; y++) {
-                const cell = this.cellMatrix[x][y];
-                cell.connectedDirs = cell.solutionDirs;
-                cell.rotateTarget = 0;
-                cell.rotateAngle = 0;
+    isSolving() {
+        return this.solveMoves !== null;
+    }
+
+    // Queue the quarter turns that take every cell to its solution, working outwards from
+    // the server like the Java autosolve(). update() then plays them back one step at a time.
+    startSolve(now: number) {
+        if (!this.rootCell) return;
+        const moves: { cell: Cell; angle: number }[] = [];
+        const seen = new Set<Cell>([this.rootCell]);
+        const queue = [this.rootCell];
+        while (queue.length > 0) {
+            const cell = queue.shift()!;
+            // Count turns already in flight, so a half-finished player rotation is accounted for
+            const current = turnDirs(cell.connectedDirs, cell.rotateTarget / 90);
+            const turns = [0, 1, 2, 3].find(q => turnDirs(current, q) === cell.solutionDirs) ?? 0;
+            if (turns === 1) moves.push({ cell, angle: 90 });
+            else if (turns === 3) moves.push({ cell, angle: -90 });
+            else if (turns === 2) {
+                const angle = Math.random() < 0.5 ? 90 : -90;
+                moves.push({ cell, angle }, { cell, angle });
+            }
+
+            for (const d of CARDINALS) {
+                const next = cell.next(d);
+                if ((cell.solutionDirs & d) === d && next && !seen.has(next)) {
+                    seen.add(next);
+                    queue.push(next);
+                }
             }
         }
-        this.updateConnections();
-        return "Solved!";
+        this.solveMoves = moves;
+        this.solverUsed = true;
+        this.lastSolveStep = now - CONSTANTS.SOLVE_STEP_TIME;
+    }
+
+    stopSolve() {
+        this.solveMoves = null;
+        this.solvingCell = null;
+    }
+
+    // One solver step: move the highlight to the next cell, unlock it, or turn it.
+    stepSolver(now: number) {
+        if (!this.solveMoves || now - this.lastSolveStep < CONSTANTS.SOLVE_STEP_TIME) return;
+        this.lastSolveStep = now;
+
+        const move = this.solveMoves[0];
+        if (!move) {
+            this.stopSolve();
+            return;
+        }
+        if (move.cell !== this.solvingCell) {
+            this.solvingCell = move.cell;
+        } else if (move.cell.isLocked) {
+            move.cell.isLocked = false;
+        } else {
+            this.solveMoves.shift();
+            move.cell.isBlind = false;
+            move.cell.rotate(move.angle, CONSTANTS.SOLVE_ROTATE_TIME, now);
+            this.assets.playSound('turn.ogg');
+            this.updateConnections();
+        }
     }
 
     rotateCellAt(x: number, y: number): boolean {
@@ -368,6 +435,7 @@ export class Board {
 
     // Lock a cable cell so it can't be rotated by accident (Java long press).
     toggleLock(cell: Cell): boolean {
+        if (this.isSolving()) return false;
         if (cell.connectedDirs === CellDirection.NONE || cell.connectedDirs === CellDirection.FREE) {
             this.assets.playSound('click.ogg');
             return false;

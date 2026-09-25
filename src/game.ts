@@ -71,6 +71,13 @@ export class Game {
         this.running = false;
     }
 
+    // Start the auto-solver, or stop it if it's already running
+    toggleSolve() {
+        if (!this.running) return;
+        if (this.board.isSolving()) this.board.stopSolve();
+        else this.board.startSolve(performance.now());
+    }
+
     toggleSound() {
         this.assets.muted = !this.assets.muted;
         return !this.assets.muted;
@@ -122,8 +129,6 @@ export class Game {
         this.lastTime = performance.now();
         requestAnimationFrame((t) => this.loop(t));
 
-        // Update UI
-        document.getElementById('message')!.innerText = "You Win!"; // resetting message, will be hidden
     }
 
     resize() {
@@ -181,8 +186,11 @@ export class Game {
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.board.draw(this.ctx);
         
-        // Draw selection highlight
-        if (this.selectedCell && this.running) {
+        // Draw selection highlight, or the cell the auto-solver is working on
+        const solving = this.board.solvingCell;
+        if (solving) {
+            this.board.drawSelection(this.ctx, solving.xindex, solving.yindex);
+        } else if (this.selectedCell && this.running) {
             this.board.drawSelection(this.ctx, this.selectedCell.x, this.selectedCell.y);
         }
     }
@@ -195,11 +203,7 @@ export class Game {
 
         const result = this.board.update(now);
 
-        // Draw
-        this.ctx.fillStyle = '#000';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-        this.board.draw(this.ctx);
+        this.draw();
 
         // Update Stats
         const currentTime = Date.now();
@@ -216,6 +220,7 @@ export class Game {
             this.running = false;
 
             // Update final stats for overlay
+            document.getElementById('message')!.innerText = this.board.solverUsed ? 'Solved!' : 'You Win!';
             document.getElementById('final-time')!.innerText = timeString;
             document.getElementById('final-moves')!.innerText = this.board.moves.toString();
 

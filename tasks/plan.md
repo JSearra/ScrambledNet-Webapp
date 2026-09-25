@@ -21,7 +21,7 @@
 - [x] **T8 Browser verification** with `npm run dev`.
 - [x] **T9 Sounds** (SPEC R7). Depends: T5, T6.
   - Accept: tests record the right sound for each event; all six sounds are loaded.
-- [ ] **T10 Animated auto-solve** (SPEC R8). Depends: T5.
+- [x] **T10 Animated auto-solve** (SPEC R8). Depends: T5.
   - Accept: solving a scrambled board ends in a WIN without changing `moves`; locked and blind cells get
     fixed; input is refused while solving; stopping clears the queue; "Solve" button in the menu.
 - [ ] **T11 Data blips** (SPEC R9). Depends: T1.
