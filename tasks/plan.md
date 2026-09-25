@@ -5,7 +5,7 @@
 - [x] **T2 Branch-limited net generation + 85% fill retry** (SPEC R1). Depends: T1.
   - Accept: over many Novice boards no non-root cell has 4 dirs; Master boards do sometimes; every net is
     a tree reachable from the root; fill ≥ 85% on a typical board size.
-- [ ] **T3 Immediate uniform scramble** (SPEC R2). Depends: T1.
+- [x] **T3 Immediate uniform scramble** (SPEC R2). Depends: T1.
   - Accept: no cell `isRotated()` after `setupBoard`; each cell's dirs is a rotation of `solutionDirs`;
     all 4 rotations occur.
 - [ ] **T4 Blind cells on Insane** (SPEC R3). Depends: T3.

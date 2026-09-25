@@ -130,9 +130,10 @@ export class Board {
         // Jumble
         for (let x = this.boardStartX; x < this.boardEndX; x++) {
             for (let y = this.boardStartY; y < this.boardEndY; y++) {
-                // Random rotation -2 to +1 aka -180, -90, 0, 90?
-                const rots = Math.floor(Math.random() * 4) - 2;
-                this.cellMatrix[x][y].rotate(rots * 90, 0);
+                // Turn instantly by 0-3 quarter turns; no animation needed before the first frame
+                const cell = this.cellMatrix[x][y];
+                const turns = Math.floor(Math.random() * 4);
+                for (let i = 0; i < turns; i++) cell.setDirs(cell.rotatedDirs(90));
             }
         }
 
