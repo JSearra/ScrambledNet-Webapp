@@ -27,4 +27,4 @@
 - [x] **T11 Data blips** (SPEC R9). Depends: T1.
   - Accept: blips spread from the root along connected cables only, stop at gaps, get cleared by
     rotation; they're drawn every frame in both themes.
-- [ ] **T12 Browser verification**: blips, solver, sounds loading, touch taps counting moves.
+- [x] **T12 Browser verification**: blips, solver, sounds loading, touch taps counting moves.
