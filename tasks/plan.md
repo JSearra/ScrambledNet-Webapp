@@ -1,6 +1,6 @@
 # Plan: Board logic parity (see SPEC.md)
 
-- [ ] **T1 Test harness.** Add vitest, `npm test` script, a smoke test that builds a Board with stubbed Assets.
+- [x] **T1 Test harness.** Add vitest, `npm test` script, a smoke test that builds a Board with stubbed Assets.
   - Accept: `npm test` passes; `npm run build` passes.
 - [ ] **T2 Branch-limited net generation + 85% fill retry** (SPEC R1). Depends: T1.
   - Accept: over many Novice boards no non-root cell has 4 dirs; Master boards do sometimes; every net is
