@@ -134,6 +134,7 @@ export class Board {
                 const cell = this.cellMatrix[x][y];
                 const turns = Math.floor(Math.random() * 4);
                 for (let i = 0; i < turns; i++) cell.setDirs(cell.rotatedDirs(90));
+                cell.isBlind = cell.numDirs() >= skill.blind;
             }
         }
 
@@ -302,6 +303,7 @@ export class Board {
         if (changed) {
             this.updateConnections();
             if (this.isSolved()) {
+                this.revealBlind();
                 return 'WIN';
             }
         }
@@ -316,7 +318,14 @@ export class Board {
         }
     }
 
+    revealBlind() {
+        for (const column of this.cellMatrix) {
+            for (const cell of column) cell.isBlind = false;
+        }
+    }
+
     autoSolve() {
+        this.revealBlind();
         for (let x = this.boardStartX; x < this.boardEndX; x++) {
             for (let y = this.boardStartY; y < this.boardEndY; y++) {
                 const cell = this.cellMatrix[x][y];

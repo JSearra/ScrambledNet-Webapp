@@ -8,7 +8,7 @@
 - [x] **T3 Immediate uniform scramble** (SPEC R2). Depends: T1.
   - Accept: no cell `isRotated()` after `setupBoard`; each cell's dirs is a rotation of `solutionDirs`;
     all 4 rotations occur.
-- [ ] **T4 Blind cells on Insane** (SPEC R3). Depends: T3.
+- [x] **T4 Blind cells on Insane** (SPEC R3). Depends: T3.
   - Accept: Insane cells with ≥3 dirs are blind, others not; other skills never blind; solving clears blind.
 - [ ] **T5 Unified rotate + move counting** (SPEC R4). Depends: T1.
   - Accept: FREE/NONE/locked cells don't rotate; mouse/touch/keyboard share one path; repeat tap on the
