@@ -27,6 +27,19 @@ where the port has drifted, and fix the port's own bugs. The UI, themes and buil
    the keyboard-selected cell.
 6. **The rotation clock is safe.** A negative elapsed time (a `requestAnimationFrame` timestamp
    earlier than the `performance.now()` taken at click time) must not draw the cable turning backwards.
+7. **Sounds as in Java.** `start` on a new game, `turn` on a rotation, `click` on a refused
+   rotate/lock, `pop` on a lock toggle, `connect` when a rotation joins new cells to the network,
+   `win` on solve (instead of `connect`).
+8. **Animated auto-solve** (Java `autosolve`). A "Solve" button in the in-game menu replays the
+   solution from the server outwards, one quarter turn every 100 ms, unlocking and unblinding cells as
+   it goes and highlighting the cell being solved. Pressing it again stops the solver. Player input is
+   ignored while it runs, solver turns don't count as moves, and the win screen reads "Solved!".
+9. **Data blips** (Java `advanceBlips`/`transferBlips`/`drawBlips`). Every 6th step (one step is 300 ms,
+   half a cell) the server sends a blip down each connected cable. A blip that arrives in a cell leaves
+   by every other connected side, so it follows the network and dies at a gap. Rotating a cell removes
+   its blips. Blips use the Java sprites (green when connected, grey when not, a glow at the server).
+   Terminals that receive data flicker green lines on their screen. Blind cells show no blips.
+   The sprites are loaded for both themes.
 
 ## Testing
 
