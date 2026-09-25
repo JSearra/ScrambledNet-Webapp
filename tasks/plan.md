@@ -10,7 +10,7 @@
     all 4 rotations occur.
 - [x] **T4 Blind cells on Insane** (SPEC R3). Depends: T3.
   - Accept: Insane cells with ≥3 dirs are blind, others not; other skills never blind; solving clears blind.
-- [ ] **T5 Unified rotate + move counting** (SPEC R4). Depends: T1.
+- [x] **T5 Unified rotate + move counting** (SPEC R4). Depends: T1.
   - Accept: FREE/NONE/locked cells don't rotate; mouse/touch/keyboard share one path; repeat tap on the
     same cell doesn't add a move; touch counts moves.
 - [ ] **T6 Lock toggle** (SPEC R5). Depends: T5.

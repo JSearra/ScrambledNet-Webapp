@@ -11,7 +11,6 @@ export class Game {
     running: boolean;
     lastTime: number;
     currentSkill: Skill | null;
-    moves: number;
     startTime: number;
     selectedCell: { x: number; y: number } | null;
 
@@ -23,24 +22,19 @@ export class Game {
         this.running = false;
         this.lastTime = 0;
         this.currentSkill = null;
-        this.moves = 0;
         this.startTime = 0;
         this.selectedCell = null;
 
 
         // Input handling
         // Handle both mouse and touch
-        this.canvas.addEventListener('mousedown', (e) => this.handleInput(e));
+        this.canvas.addEventListener('mousedown', (e) => this.handleInput(e.clientX, e.clientY));
         this.canvas.addEventListener('touchstart', (e) => {
             e.preventDefault(); // Prevent scrolling
             // Use the first touch point
             if (e.changedTouches.length > 0) {
                 const touch = e.changedTouches[0];
-                // Create a fake event-like object or just pass coords
-                const rect = this.canvas.getBoundingClientRect();
-                const x = touch.clientX - rect.left;
-                const y = touch.clientY - rect.top;
-                this.board.handleInput(x, y);
+                this.handleInput(touch.clientX, touch.clientY);
             }
         }, { passive: false });
 
@@ -67,7 +61,6 @@ export class Game {
         }
 
         // Reset stats
-        this.moves = 0;
         this.startTime = Date.now();
 
         // Reset and Resize
@@ -116,14 +109,10 @@ export class Game {
         }
     }
 
-    handleInput(e: MouseEvent) {
+    handleInput(clientX: number, clientY: number) {
+        if (!this.running) return;
         const rect = this.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const validMove = this.board.handleInput(x, y);
-        if (validMove && this.running) {
-            this.moves++;
-        }
+        this.board.handleInput(clientX - rect.left, clientY - rect.top);
     }
 
     handleKeyboard(e: KeyboardEvent) {
@@ -152,11 +141,7 @@ export class Game {
         } else if (e.key === 'ArrowRight') {
             this.selectedCell.x = Math.min(this.board.gridWidth - 1, this.selectedCell.x + 1);
         } else if (e.key === ' ' || e.key === 'Enter') {
-            // Rotate selected cell
-            const validMove = this.board.rotateCellAt(this.selectedCell.x, this.selectedCell.y);
-            if (validMove && this.running) {
-                this.moves++;
-            }
+            this.board.rotateCellAt(this.selectedCell.x, this.selectedCell.y);
         }
     }
 
@@ -193,7 +178,7 @@ export class Game {
         const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
         document.getElementById('time-display')!.innerText = timeString;
-        document.getElementById('moves-display')!.innerText = this.moves.toString();
+        document.getElementById('moves-display')!.innerText = this.board.moves.toString();
 
         if (result === 'WIN') {
             this.assets.playSound('win.ogg');
@@ -201,7 +186,7 @@ export class Game {
 
             // Update final stats for overlay
             document.getElementById('final-time')!.innerText = timeString;
-            document.getElementById('final-moves')!.innerText = this.moves.toString();
+            document.getElementById('final-moves')!.innerText = this.board.moves.toString();
 
             document.getElementById('ui-overlay')!.classList.remove('hidden');
         }

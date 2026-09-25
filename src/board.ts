@@ -10,6 +10,8 @@ export class Board {
     rootCell: Cell | null;
     isConnected: boolean[][];
     connectingCells: Cell[];
+    moves: number;
+    lastRotatedCell: Cell | null;
 
     boardWidth: number;
     boardHeight: number;
@@ -31,6 +33,8 @@ export class Board {
         this.rootCell = null;
         this.isConnected = [];
         this.connectingCells = [];
+        this.moves = 0;
+        this.lastRotatedCell = null;
 
         // Board layout within the grid
         this.boardWidth = 0;
@@ -93,6 +97,8 @@ export class Board {
         this.boardEndY = this.boardStartY + this.boardHeight;
 
         const wrap = skill.wrapped;
+        this.moves = 0;
+        this.lastRotatedCell = null;
 
         for (let x = 0; x < this.gridWidth; x++) {
             for (let y = 0; y < this.gridHeight; y++) {
@@ -267,27 +273,35 @@ export class Board {
         return true;
     }
 
+    cellAtPixel(x: number, y: number): Cell | null {
+        if (this.cellWidth <= 0 || this.cellHeight <= 0) return null;
+        const gx = Math.floor((x - this.paddingX) / this.cellWidth);
+        const gy = Math.floor((y - this.paddingY) / this.cellHeight);
+        if (gx < 0 || gx >= this.gridWidth || gy < 0 || gy >= this.gridHeight) return null;
+        return this.cellMatrix[gx][gy];
+    }
+
     handleInput(x: number, y: number) {
-        // Find which cell was clicked
-        for (let i = 0; i < this.gridWidth; i++) {
-            for (let j = 0; j < this.gridHeight; j++) {
-                const cell = this.cellMatrix[i][j];
-                if (x >= cell.cellLeft && x < cell.cellLeft + cell.cellWidth &&
-                    y >= cell.cellTop && y < cell.cellTop + cell.cellHeight) {
+        const cell = this.cellAtPixel(x, y);
+        return cell ? this.rotateCell(cell) : false;
+    }
 
-                    if (cell.connectedDirs !== CellDirection.NONE &&
-                        cell.connectedDirs !== CellDirection.FREE &&
-                        !cell.isLocked) {
-
-                        cell.rotate(90, 250);
-                        this.assets.playSound('click.ogg');
-
-                        return true;
-                    }
-                }
-            }
+    // Rotate a cell clockwise. Repeat taps on the same cell count as a single move,
+    // since tapping only turns one way (as in the Java cellClicked()).
+    rotateCell(cell: Cell): boolean {
+        if (cell.connectedDirs === CellDirection.NONE ||
+            cell.connectedDirs === CellDirection.FREE ||
+            cell.isLocked) {
+            return false;
         }
-        return false;
+        cell.rotate(90, 250);
+        this.assets.playSound('click.ogg');
+        if (cell !== this.lastRotatedCell) {
+            this.moves++;
+            this.lastRotatedCell = cell;
+        }
+        this.updateConnections();
+        return true;
     }
 
     update(now: number) {
@@ -342,13 +356,7 @@ export class Board {
         if (x < 0 || x >= this.gridWidth || y < 0 || y >= this.gridHeight) {
             return false;
         }
-        const cell = this.cellMatrix[x][y];
-        if (cell.connectedDirs === CellDirection.NONE) {
-            return false;
-        }
-        cell.rotate(90, 250); // 90 degree rotation, 250ms animation
-        this.updateConnections();
-        return true;
+        return this.rotateCell(this.cellMatrix[x][y]);
     }
 
     drawSelection(ctx: CanvasRenderingContext2D, x: number, y: number) {
