@@ -220,28 +220,17 @@ export class Cell {
             this.rotateAngle = (elapsed / this.rotateTime) * 90;
             if (this.rotateTarget < 0) this.rotateAngle = -this.rotateAngle;
 
-            if (Math.abs(this.rotateAngle) >= 90) {
-                if (this.rotateTarget > 0) {
-                    this.setDirs(this.rotatedDirs(90));
-                    if (this.rotateAngle >= this.rotateTarget) {
-                        this.rotateAngle = this.rotateTarget = 0;
-                    } else {
-                        this.rotateAngle -= 90;
-                        this.rotateTarget -= 90;
-                        this.rotateStart += this.rotateTime;
-                    }
-                } else {
-                    this.setDirs(this.rotatedDirs(-90));
-                    if (this.rotateAngle <= this.rotateTarget) {
-                        this.rotateAngle = this.rotateTarget = 0;
-                    } else {
-                        this.rotateAngle += 90;
-                        this.rotateTarget += 90;
-                        this.rotateStart += this.rotateTime;
-                    }
-                }
+            // Apply every quarter turn that has completed. A slow frame can finish more than one,
+            // so loop rather than dropping the rest of the queued rotation.
+            const step = this.rotateTarget > 0 ? 90 : -90;
+            while (this.rotateTarget !== 0 && Math.abs(this.rotateAngle) >= 90) {
+                this.setDirs(this.rotatedDirs(step));
+                this.rotateAngle -= step;
+                this.rotateTarget -= step;
+                this.rotateStart += this.rotateTime;
                 changed = true;
             }
+            if (this.rotateTarget === 0) this.rotateAngle = 0;
         }
         return changed;
     }

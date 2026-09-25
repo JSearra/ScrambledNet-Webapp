@@ -4,8 +4,8 @@ import { Board } from '../src/board';
 import { makeBoard, boardCells } from './helpers';
 
 // Drive the board with a simulated clock until it reports a win (or we give up).
-function run(board: Board, start: number, maxMs = 60000) {
-    for (let t = start; t < start + maxMs; t += 20) {
+function run(board: Board, start: number, maxMs = 60000, frame = 20) {
+    for (let t = start; t < start + maxMs; t += frame) {
         if (board.update(t) === 'WIN') return t;
     }
     return null;
@@ -62,5 +62,13 @@ describe('auto-solve', () => {
         board.setupBoard(SKILL.EXPERT, 8, 6);
         expect(board.isSolving()).toBe(false);
         expect(board.solverUsed).toBe(false);
+    });
+
+    it('still solves when frames arrive slower than the rotation time', () => {
+        for (let i = 0; i < 10; i++) {
+            const board = unsolvedBoard();
+            board.startSolve(0);
+            expect(run(board, 0, 600000, 1000)).not.toBeNull();
+        }
     });
 });
