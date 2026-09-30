@@ -78,6 +78,7 @@ html {
 
 #instructions-screen,
 #settings-screen,
+#language-screen,
 #ingame-menu-screen {
     position: fixed;
     top: 0;
@@ -164,6 +165,62 @@ html {
             top: 3px;
         }
     }
+}
+
+/* Language */
+.menu-btn.language-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-transform: none;
+
+    .globe-icon {
+        width: 1.3em;
+        height: 1.3em;
+        flex-shrink: 0;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.6;
+        stroke-linecap: round;
+    }
+}
+
+.language-modal {
+    max-height: 85vh;
+}
+
+.language-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 6px;
+    overflow-y: auto;
+    padding: 2px;
+}
+
+.language-option {
+    padding: 0.6rem 0.5rem;
+    font-size: 1rem;
+    background-color: #2c3e50;
+    color: $text-color;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+        border-color: $btn-hover-border;
+    }
+
+    &.selected {
+        background-color: $neon-blue;
+        color: #fff;
+        font-weight: bold;
+    }
+}
+
+.language-auto {
+    grid-column: 1 / -1;
 }
 
 /* Settings Specifics */
@@ -321,7 +378,7 @@ html {
         color: #aaa;
     }
 
-    span {
+    span:not(.stat-label) {
         color: $neon-green;
         font-weight: bold;
         margin-left: 5px;
@@ -355,8 +412,19 @@ canvas {
 
 .overlay-buttons {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 1rem;
     margin-top: 2rem;
+    padding: 0 16px;
+
+    // Grow with longer translations instead of wrapping inside the button
+    .menu-btn {
+        width: auto;
+        min-width: 160px;
+        max-width: 100%;
+        margin: 0;
+    }
 }
 
 .hidden {
@@ -391,30 +459,25 @@ h1#message {
     }
 }
 
-/* Short landscape screens (phones on their side): two-column menu */
+/* Short landscape screens (phones on their side): rows of three buttons */
 @media (orientation: landscape) and (max-height: 520px) {
     .game-logo {
         max-height: 24vh;
     }
 
     .difficulty-menu {
-        display: grid;
-        grid-template-columns: repeat(2, auto);
-        gap: 6px 12px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px 10px;
         padding: 10px;
+        max-width: calc(3 * 170px + 2 * 10px + 2 * 10px);
     }
 
     .difficulty-menu .menu-btn {
-        width: 180px;
+        width: 170px;
+        margin: 0;
         padding: 0.55rem;
         font-size: 1rem;
-    }
-
-    // Odd one out gets its own centred row: Novice/Normal, Expert/Master,
-    // Insane, Instructions/Settings, (Install)
-    #skill-insane,
-    #install-btn {
-        grid-column: 1 / -1;
-        justify-self: center;
     }
 }

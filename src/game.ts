@@ -2,6 +2,7 @@ import { Board } from './board.js';
 import { Assets } from './assets.js';
 import { getBoardSize } from './constants.js';
 import { Skill } from './types.js';
+import { t } from './i18n.js';
 
 const LONG_PRESS_TIME = 500;
 
@@ -221,7 +222,7 @@ export class Game {
             this.running = false;
 
             // Update final stats for overlay
-            document.getElementById('message')!.innerText = this.board.solverUsed ? 'Solved!' : 'You Win!';
+            document.getElementById('message')!.innerText = t(this.board.solverUsed ? 'win.solved' : 'win.youWin');
             document.getElementById('final-time')!.innerText = timeString;
             document.getElementById('final-moves')!.innerText = this.board.moves.toString();
 
