@@ -50,6 +50,31 @@ This project includes the necessary metadata for F-Droid publication in `metadat
 - **Assets**: Ensure all assets (images/sounds) are compatible with the license.
 - **Dependencies**: Uses standard npm packages and Capacitor, which are F-Droid compatible.
 
+## Microsoft Store (Windows) Publication
+
+The Windows version is the PWA wrapped in an MSIX package with [PWABuilder](https://www.pwabuilder.com). The package loads the deployed site, so web updates reach Store users without a new submission. Only manifest, icon or listing changes need a resubmission.
+
+### Prerequisites
+- The site is deployed over HTTPS (Netlify, see `netlify.toml`) at a stable URL. The package is tied to that URL.
+- The web manifest (`vite.config.js`) provides an `id`, `categories`, `any` and `maskable` icons (`public/assets/icon-*.png`) and `wide`/`narrow` screenshots (`public/screenshots/`).
+- The privacy policy is served at `<site>/privacy.html` (source: `public/privacy.html`) and linked from the in-game Instructions screen.
+
+### Steps
+1. **Partner Center**: Register at [partner.microsoft.com](https://partner.microsoft.com/dashboard) (Microsoft Store program) and **reserve the app name** "Scrambled Net".
+2. In the app's **Product management → Product identity**, copy the *Package/Identity Name*, *Publisher ID* (`CN=...`) and *Publisher display name*.
+3. **Package**: Open [pwabuilder.com](https://www.pwabuilder.com), enter the deployed URL, then **Package for stores → Windows**. Paste the three identity values and set the version (e.g. `1.1.0.0`, increase it for every resubmission).
+4. **Test**: Install the test package from the downloaded zip (see its README) and check that the game works offline.
+5. **Submit** a new submission in Partner Center:
+   - **Category**: Games → Puzzle & trivia
+   - **Age ratings**: Complete the IARC questionnaire (no violence, no user interaction, no data collection)
+   - **Privacy policy URL**: `<site>/privacy.html`
+   - **Store listing**: Description from `fastlane/metadata/android/en-US/`, screenshots from `public/screenshots/wide-*.png` (1366×768)
+   - **Packages**: Upload the `.msixbundle` from PWABuilder
+6. Submit for certification (usually a few hours to a few days).
+
+### Regenerating screenshots
+Run `npm run build && npx vite preview`, set the browser viewport to 1366×768 (or 720×1280 for the narrow one), and capture the start screen and a game in progress into `public/screenshots/` with the same file names.
+
 ## Credits
 - Original Game Idea: KNetWalk / Ian Cameron Smith
 - Modern Assets: [jimnastic89/ModernScrambledNet](https://github.com/jimnastic89/ModernScrambledNet)
