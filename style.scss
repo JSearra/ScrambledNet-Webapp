@@ -57,9 +57,10 @@ html {
 }
 
 .game-logo {
-    max-width: 90%;
-    max-height: 200px;
-    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.8));
+    width: auto;
+    height: auto;
+    max-width: min(90%, 560px);
+    max-height: 22vh;
 }
 
 .difficulty-menu {
