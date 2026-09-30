@@ -52,6 +52,9 @@ html {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    // Keep the top reachable if the content is ever taller than the screen
+    justify-content: safe center;
+    overflow-y: auto;
     align-items: center;
     z-index: 100;
 }
@@ -385,5 +388,33 @@ h1#message {
         p {
             font-size: 1rem;
         }
+    }
+}
+
+/* Short landscape screens (phones on their side): two-column menu */
+@media (orientation: landscape) and (max-height: 520px) {
+    .game-logo {
+        max-height: 24vh;
+    }
+
+    .difficulty-menu {
+        display: grid;
+        grid-template-columns: repeat(2, auto);
+        gap: 6px 12px;
+        padding: 10px;
+    }
+
+    .difficulty-menu .menu-btn {
+        width: 180px;
+        padding: 0.55rem;
+        font-size: 1rem;
+    }
+
+    // Odd one out gets its own centred row: Novice/Normal, Expert/Master,
+    // Insane, Instructions/Settings, (Install)
+    #skill-insane,
+    #install-btn {
+        grid-column: 1 / -1;
+        justify-self: center;
     }
 }
