@@ -9,9 +9,13 @@ const EU_LANGUAGES = [
     'hu', 'it', 'lt', 'lv', 'mt', 'nl', 'pl', 'pt', 'ro', 'sk', 'sl', 'sv',
 ];
 
+const OTHER_LANGUAGES = [
+    'af', 'ca', 'id', 'ja', 'ko', 'ms', 'nb', 'ru', 'tr', 'uk', 'vi', 'zh', 'zh-Hant',
+];
+
 describe('locale files', () => {
-    it('cover all 24 official EU languages', () => {
-        expect(Object.keys(locales).sort()).toEqual(EU_LANGUAGES);
+    it('cover all 24 official EU languages plus the extra ones', () => {
+        expect(Object.keys(locales).sort()).toEqual([...EU_LANGUAGES, ...OTHER_LANGUAGES].sort());
     });
 
     it('all have exactly the same keys as English, none empty', () => {
@@ -42,7 +46,9 @@ describe('locale files', () => {
         const names = availableLanguages().map(l => l.name);
         expect(names).toContain('Deutsch');
         expect(names).toContain('Ελληνικά');
-        expect(names).toHaveLength(24);
+        expect(names).toContain('日本語');
+        expect(names).toContain('Indonesia');
+        expect(names).toHaveLength(EU_LANGUAGES.length + OTHER_LANGUAGES.length);
     });
 });
 
@@ -54,12 +60,29 @@ describe('detectLanguage', () => {
         expect(detectLanguage(['FR_ca'])).toBe('fr');
     });
 
+    it('picks Simplified or Traditional Chinese by script and region', () => {
+        expect(detectLanguage(['zh-CN'])).toBe('zh');
+        expect(detectLanguage(['zh'])).toBe('zh');
+        expect(detectLanguage(['zh-SG'])).toBe('zh');
+        expect(detectLanguage(['zh-Hans-HK'])).toBe('zh');
+        expect(detectLanguage(['zh-TW'])).toBe('zh-Hant');
+        expect(detectLanguage(['zh-HK'])).toBe('zh-Hant');
+        expect(detectLanguage(['zh-Hant'])).toBe('zh-Hant');
+    });
+
+    it('maps other Norwegian codes and the old Indonesian code', () => {
+        expect(detectLanguage(['no'])).toBe('nb');
+        expect(detectLanguage(['nn-NO'])).toBe('nb');
+        expect(detectLanguage(['nb-NO'])).toBe('nb');
+        expect(detectLanguage(['in-ID'])).toBe('id');
+    });
+
     it('uses the first preferred language we have', () => {
-        expect(detectLanguage(['ja-JP', 'nb-NO', 'sv-SE', 'en-US'])).toBe('sv');
+        expect(detectLanguage(['th-TH', 'hi-IN', 'sv-SE', 'en-US'])).toBe('sv');
     });
 
     it('returns null when nothing matches', () => {
-        expect(detectLanguage(['ja', 'zh-CN'])).toBeNull();
+        expect(detectLanguage(['th', 'hi-IN'])).toBeNull();
         expect(detectLanguage([])).toBeNull();
     });
 });
@@ -71,7 +94,7 @@ describe('resolveLanguage', () => {
     });
 
     it('falls back to English when the device language is not available', () => {
-        expect(resolveLanguage(AUTO_LANGUAGE, ['ja'])).toBe('en');
+        expect(resolveLanguage(AUTO_LANGUAGE, ['th'])).toBe('en');
     });
 
     it('prefers a language the player picked over the device language', () => {

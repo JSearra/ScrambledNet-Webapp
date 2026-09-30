@@ -35,11 +35,29 @@ export function availableLanguages(): LanguageInfo[] {
 export function detectLanguage(preferred: readonly string[], available: readonly string[] = Object.keys(locales)): string | null {
     const lookup = new Map(available.map(code => [code.toLowerCase(), code]));
     for (const tag of preferred) {
-        const lower = tag.toLowerCase().replace('_', '-');
-        const match = lookup.get(lower) ?? lookup.get(lower.split('-')[0]);
+        const lower = tag.toLowerCase().replace(/_/g, '-');
+        const match = lookup.get(lower) ?? lookup.get(normalizeTag(lower));
         if (match) return match;
     }
     return null;
+}
+
+// Tags that don't map to our file names by just dropping the region
+const LANGUAGE_ALIASES: Record<string, string> = {
+    no: 'nb', // Norwegian (generic)
+    nn: 'nb', // Norwegian Nynorsk: Bokmål is the closest we have
+    in: 'id', // Old code for Indonesian
+};
+const TRADITIONAL_CHINESE_REGIONS = new Set(['tw', 'hk', 'mo']);
+
+/** "de-at" -> "de", "zh-tw" / "zh-hant-hk" -> "zh-hant", "zh-cn" -> "zh", "no" -> "nb". */
+function normalizeTag(lower: string): string {
+    const [language, ...rest] = lower.split('-');
+    if (language === 'zh') {
+        const traditional = rest.includes('hant') || (!rest.includes('hans') && rest.some(part => TRADITIONAL_CHINESE_REGIONS.has(part)));
+        return traditional ? 'zh-hant' : 'zh';
+    }
+    return LANGUAGE_ALIASES[language] ?? language;
 }
 
 /** Resolve a stored preference ("auto" or a language code) to a language we have. */

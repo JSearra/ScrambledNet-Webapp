@@ -50,6 +50,12 @@ This project includes the necessary metadata for F-Droid publication in `metadat
 - **Assets**: Ensure all assets (images/sounds) are compatible with the license.
 - **Dependencies**: Uses standard npm packages and Capacitor, which are F-Droid compatible.
 
+## Translations
+
+The game ships in 37 languages: the 24 official EU languages plus Afrikaans, Catalan, Chinese (Simplified and Traditional), Indonesian, Japanese, Korean, Malay, Norwegian Bokmål, Russian, Turkish, Ukrainian and Vietnamese. It follows the device language when a matching translation exists and otherwise uses English. Players can override it with the globe button at the bottom of the main menu.
+
+Each language is one file in `src/locales/<code>.json`. To add or fix one, copy `en.json`, translate the values (keep the keys and the HTML tags in `instructions.intro` and `privacy.text`) and run `npm test`. The tests check that every file has exactly the same keys as English. A new file appears in the language picker automatically.
+
 ## Microsoft Store (Windows) Publication
 
 The Windows version is the PWA wrapped in an MSIX package with [PWABuilder](https://www.pwabuilder.com). The package loads the deployed site, so web updates reach Store users without a new submission. Only manifest, icon or listing changes need a resubmission.
