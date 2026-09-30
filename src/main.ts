@@ -101,10 +101,12 @@ window.addEventListener('load', () => {
         }
     });
 
-    // In-Game Menu Controls
-    // In-Game Menu Controls (moved up)
+    menuBtn!.addEventListener('click', () => {
+        uiOverlay.classList.add('hidden');
+        stopGame();
+    });
 
-    menuBtn!.addEventListener('click', openIngameMenu);
+    // In-Game Menu Controls
 
     resumeBtn.addEventListener('click', () => {
         ingameMenuScreen.classList.add('hidden');
