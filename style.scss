@@ -134,8 +134,9 @@ html {
 }
 
 .instructions-text {
-    text-align: left;
-    padding-right: 10px;
+    // start/inline-* so the text mirrors in right-to-left languages
+    text-align: start;
+    padding-inline-end: 10px;
 
     h3 {
         color: $neon-blue;
@@ -147,24 +148,34 @@ html {
 
     ul {
         list-style-type: none;
-        padding-left: 0;
+        padding-inline-start: 0;
     }
 
     li {
         margin-bottom: 8px;
-        padding-left: 15px;
+        padding-inline-start: 15px;
         position: relative;
         color: #bdc3c7;
 
         &::before {
             content: "►";
             position: absolute;
-            left: 0;
+            inset-inline-start: 0;
             color: $neon-blue;
             font-size: 0.8em;
             top: 3px;
         }
     }
+}
+
+[dir="rtl"] .instructions-text li::before {
+    content: "◄";
+}
+
+// The game board isn't mirrored, so keep its bottom bar (whose Menu button
+// is lined up with the board's left edge) left-to-right as well
+#bottom-bar {
+    direction: ltr;
 }
 
 /* Language */

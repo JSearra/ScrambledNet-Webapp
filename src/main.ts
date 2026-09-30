@@ -232,6 +232,7 @@ window.addEventListener('load', () => {
             button.classList.toggle('selected', selected);
             button.setAttribute('aria-pressed', String(selected));
             button.lang = option.lang;
+            button.dir = 'auto'; // Each name in its own script direction
             button.textContent = option.name;
             button.addEventListener('click', () => {
                 languagePreference = option.code;

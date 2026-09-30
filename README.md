@@ -52,7 +52,7 @@ This project includes the necessary metadata for F-Droid publication in `metadat
 
 ## Translations
 
-The game ships in 37 languages: the 24 official EU languages plus Afrikaans, Catalan, Chinese (Simplified and Traditional), Indonesian, Japanese, Korean, Malay, Norwegian Bokmål, Russian, Turkish, Ukrainian and Vietnamese. It follows the device language when a matching translation exists and otherwise uses English. Players can override it with the globe button at the bottom of the main menu.
+The game ships in 39 languages: the 24 official EU languages plus Afrikaans, Arabic, Catalan, Chinese (Simplified and Traditional), Indonesian, Japanese, Korean, Malay, Norwegian Bokmål, Persian, Russian, Turkish, Ukrainian and Vietnamese. Arabic and Persian switch the page to right-to-left (see `isRtl` in `src/i18n.ts`); the game board itself is not mirrored. It follows the device language when a matching translation exists and otherwise uses English. Players can override it with the globe button at the bottom of the main menu.
 
 Each language is one file in `src/locales/<code>.json`. To add or fix one, copy `en.json`, translate the values (keep the keys and the HTML tags in `instructions.intro` and `privacy.text`) and run `npm test`. The tests check that every file has exactly the same keys as English. A new file appears in the language picker automatically.
 

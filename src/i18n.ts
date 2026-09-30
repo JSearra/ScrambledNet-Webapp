@@ -47,7 +47,15 @@ const LANGUAGE_ALIASES: Record<string, string> = {
     no: 'nb', // Norwegian (generic)
     nn: 'nb', // Norwegian Nynorsk: Bokmål is the closest we have
     in: 'id', // Old code for Indonesian
+    prs: 'fa', // Dari (Afghan Persian)
 };
+
+// Languages written right to left: the page direction flips for these
+const RTL_LANGUAGES = new Set(['ar', 'fa', 'he', 'ur']);
+
+export function isRtl(code: string): boolean {
+    return RTL_LANGUAGES.has(code.split('-')[0].toLowerCase());
+}
 const TRADITIONAL_CHINESE_REGIONS = new Set(['tw', 'hk', 'mo']);
 
 /** "de-at" -> "de", "zh-tw" / "zh-hant-hk" -> "zh-hant", "zh-cn" -> "zh", "no" -> "nb". */
@@ -95,6 +103,7 @@ export function setLanguage(code: string): void {
     current = locales[code] ? code : DEFAULT_LANGUAGE;
     if (typeof document !== 'undefined') {
         document.documentElement.lang = current;
+        document.documentElement.dir = isRtl(current) ? 'rtl' : 'ltr';
         applyTranslations(document);
     }
 }
