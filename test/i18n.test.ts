@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import {
-    AUTO_LANGUAGE, availableLanguages, detectLanguage, locales, resolveLanguage, setLanguage, t,
+    AUTO_LANGUAGE, availableLanguages, detectLanguage, isRtl, locales, resolveLanguage, setLanguage, t,
 } from '../src/i18n';
 
 const EU_LANGUAGES = [
@@ -10,7 +10,7 @@ const EU_LANGUAGES = [
 ];
 
 const OTHER_LANGUAGES = [
-    'af', 'ca', 'id', 'ja', 'ko', 'ms', 'nb', 'ru', 'tr', 'uk', 'vi', 'zh', 'zh-Hant',
+    'af', 'ar', 'ca', 'fa', 'id', 'ja', 'ko', 'ms', 'nb', 'ru', 'tr', 'uk', 'vi', 'zh', 'zh-Hant',
 ];
 
 describe('locale files', () => {
@@ -77,6 +77,14 @@ describe('detectLanguage', () => {
         expect(detectLanguage(['in-ID'])).toBe('id');
     });
 
+    it('maps Arabic and Persian variants, including Dari', () => {
+        expect(detectLanguage(['ar-EG'])).toBe('ar');
+        expect(detectLanguage(['ar-SA'])).toBe('ar');
+        expect(detectLanguage(['fa-IR'])).toBe('fa');
+        expect(detectLanguage(['fa-AF'])).toBe('fa');
+        expect(detectLanguage(['prs'])).toBe('fa');
+    });
+
     it('uses the first preferred language we have', () => {
         expect(detectLanguage(['th-TH', 'hi-IN', 'sv-SE', 'en-US'])).toBe('sv');
     });
@@ -116,5 +124,15 @@ describe('t', () => {
 
     it('returns the key for unknown keys', () => {
         expect(t('no.such.key')).toBe('no.such.key');
+    });
+});
+
+describe('isRtl', () => {
+    it('is true only for right-to-left languages', () => {
+        expect(isRtl('ar')).toBe(true);
+        expect(isRtl('fa')).toBe(true);
+        expect(isRtl('ar-EG')).toBe(true);
+        expect(isRtl('en')).toBe(false);
+        expect(isRtl('zh-Hant')).toBe(false);
     });
 });
