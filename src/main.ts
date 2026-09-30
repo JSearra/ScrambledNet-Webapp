@@ -4,6 +4,39 @@ import { Game } from './game.js';
 import { SKILL } from './constants.js';
 import { registerSW } from 'virtual:pwa-register';
 import { Skill } from './types.js';
+import {
+    AUTO_LANGUAGE, DEFAULT_LANGUAGE, availableLanguages, detectLanguage, getLanguage,
+    locales, resolveLanguage, setLanguage, t,
+} from './i18n.js';
+
+const SETTINGS_KEY = 'scrambledNetSettings';
+
+// --- Language ---
+// "auto" follows the device language; anything else is a language the player picked.
+let languagePreference = AUTO_LANGUAGE;
+
+function deviceLanguages(): readonly string[] {
+    return navigator.languages?.length ? navigator.languages : [navigator.language];
+}
+
+function updateLanguageButton() {
+    document.getElementById('language-current')!.textContent = t('language.name');
+}
+
+function applyLanguagePreference() {
+    setLanguage(resolveLanguage(languagePreference, deviceLanguages()));
+    updateLanguageButton();
+}
+
+// Translate right away (the DOM is parsed when this module runs) so English
+// doesn't flash up while the game's images are still loading.
+try {
+    const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? '{}');
+    if (typeof stored.language === 'string') languagePreference = stored.language;
+} catch {
+    // No or unreadable saved settings: follow the device language
+}
+applyLanguagePreference();
 
 // PWA Install Prompt Handler
 let deferredPrompt: any = null;
@@ -86,7 +119,7 @@ window.addEventListener('load', () => {
 
         // Sync In-Game UI with current state
         solveBtn.classList.toggle('hidden', !game.running);
-        solveBtn.innerText = game.board.isSolving() ? 'Stop Solving' : 'Solve';
+        solveBtn.innerText = game.board.isSolving() ? t('pause.stopSolving') : t('pause.solve');
         ingameSoundToggle.checked = !game.assets.muted;
         ingameThemeSelect.value = game.assets.theme;
     }
@@ -101,10 +134,12 @@ window.addEventListener('load', () => {
         }
     });
 
-    // In-Game Menu Controls
-    // In-Game Menu Controls (moved up)
+    menuBtn!.addEventListener('click', () => {
+        uiOverlay.classList.add('hidden');
+        stopGame();
+    });
 
-    menuBtn!.addEventListener('click', openIngameMenu);
+    // In-Game Menu Controls
 
     resumeBtn.addEventListener('click', () => {
         ingameMenuScreen.classList.add('hidden');
@@ -172,6 +207,52 @@ window.addEventListener('load', () => {
         settingsScreen.classList.add('hidden');
     });
 
+    // Language Modal
+    const languageBtn = document.getElementById('language-btn')!;
+    const languageScreen = document.getElementById('language-screen')!;
+    const languageList = document.getElementById('language-list')!;
+    const languageCloseBtn = document.getElementById('language-close-btn')!;
+
+    function renderLanguageList() {
+        const deviceLanguage = detectLanguage(deviceLanguages()) ?? DEFAULT_LANGUAGE;
+        const options = [
+            {
+                code: AUTO_LANGUAGE,
+                name: `${t('language.auto')} (${locales[deviceLanguage]['language.name']})`,
+                lang: getLanguage(),
+            },
+            ...availableLanguages().map(({ code, name }) => ({ code, name, lang: code })),
+        ];
+
+        languageList.replaceChildren(...options.map(option => {
+            const button = document.createElement('button');
+            const selected = option.code === languagePreference;
+            button.type = 'button';
+            button.className = option.code === AUTO_LANGUAGE ? 'language-option language-auto' : 'language-option';
+            button.classList.toggle('selected', selected);
+            button.setAttribute('aria-pressed', String(selected));
+            button.lang = option.lang;
+            button.textContent = option.name;
+            button.addEventListener('click', () => {
+                languagePreference = option.code;
+                applyLanguagePreference();
+                saveSettings();
+                languageScreen.classList.add('hidden');
+            });
+            return button;
+        }));
+    }
+
+    languageBtn.addEventListener('click', () => {
+        renderLanguageList();
+        languageScreen.classList.remove('hidden');
+        languageList.querySelector<HTMLElement>('.selected')?.scrollIntoView({ block: 'nearest' });
+    });
+
+    languageCloseBtn.addEventListener('click', () => {
+        languageScreen.classList.add('hidden');
+    });
+
     // PWA Install Button
     const installBtn = document.getElementById('install-btn');
     if (installBtn) {
@@ -193,7 +274,7 @@ window.addEventListener('load', () => {
     // --- Settings Persistence ---
     function loadSettings() {
         try {
-            const stored = localStorage.getItem('scrambledNetSettings');
+            const stored = localStorage.getItem(SETTINGS_KEY);
             if (stored) {
                 const settings = JSON.parse(stored);
                 if (settings.theme) {
@@ -212,10 +293,11 @@ window.addEventListener('load', () => {
     function saveSettings() {
         const settings = {
             theme: game.assets.theme,
-            muted: game.assets.muted
+            muted: game.assets.muted,
+            language: languagePreference
         };
         try {
-            localStorage.setItem('scrambledNetSettings', JSON.stringify(settings));
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
         } catch (e) {
             console.error('Failed to save settings', e);
         }
