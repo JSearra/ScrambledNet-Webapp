@@ -30,25 +30,21 @@ A web-based version of the classic Scrambled Net puzzle game, packaged for Andro
 
 ## F-Droid Publication
 
-This project includes the necessary metadata for F-Droid publication in `metadata/`.
+The build recipe for F-Droid is `metadata/com.jsearra.scramblednet.yml`. It is a copy of the file that goes into [fdroiddata](https://gitlab.com/fdroid/fdroiddata), and it passes `fdroid lint` and `fdroid rewritemeta`. The store listing (title, summary, description, icon, screenshots and changelogs) is read from `fastlane/metadata/android/en-US/` in this repo, so it is not duplicated in fdroiddata.
 
-### Status
-- **Build:** ✅ SUCCESS
-- **Metadata:** ✅ Verified
-- **CI Pipeline:** ✅ Passed
+Automatic updates are enabled (`UpdateCheckMode: Tags`, `AutoUpdateMode: Version`). F-Droid picks up a new version when a tag like `v1.3.0` points at a commit where `android/app/build.gradle` has the new `versionCode` and `versionName`.
 
-### How to Submit
-1.  Go to your GitLab fork: [JSearra/scrambled-net](https://gitlab.com/JSearra/scrambled-net)
-2.  Click **"Create merge request"**.
-3.  Set the target branch to `fdroid/fdroiddata` (master).
-4.  Title: `Add Scrambled Net`
-5.  Description: `New app submission. Build verified.`
-6.  Submit!
+### Releasing a new version
+1. Bump `versionCode` and `versionName` in `android/app/build.gradle`, and `version` in `package.json`.
+2. Add `fastlane/metadata/android/en-US/changelogs/<versionCode>.txt` (500 characters max).
+3. Commit, then tag and push: `git tag v1.3.0 && git push origin v1.3.0`.
 
-### Compliance
-- **License**: ensuring the project is Open Source (GPL-3.0).
-- **Assets**: Ensure all assets (images/sounds) are compatible with the license.
-- **Dependencies**: Uses standard npm packages and Capacitor, which are F-Droid compatible.
+### Submitting to fdroiddata
+1. In your fork ([JSearra/scrambled-net](https://gitlab.com/JSearra/scrambled-net)), put the recipe at `metadata/com.jsearra.scramblednet.yml`. That file is the only change.
+2. Reopen merge request [!33313](https://gitlab.com/fdroid/fdroiddata/-/merge_requests/33313), or open a new one against `fdroid/fdroiddata` `master` using the "App inclusion" template.
+3. Wait for the pipeline, then answer reviewer comments promptly. Merge requests with no activity for a few weeks are closed.
+
+The F-Droid build server runs Debian trixie and installs Node.js from Debian (`apt-get install -y npm`). Vite needs Node 20.19 or newer.
 
 ## Translations
 
@@ -85,3 +81,8 @@ Run `npm run build && npx vite preview`, set the browser viewport to 1366×768 (
 - Original Game Idea: KNetWalk / Ian Cameron Smith
 - Modern Assets: [jimnastic89/ModernScrambledNet](https://github.com/jimnastic89/ModernScrambledNet)
 - Webapp Conversion: Jonathan Searra
+
+### Asset licenses
+- **Retro theme graphics, sounds and the app icon** come from the original Scrambled Net by Ian Cameron Smith. Its source files say GPL version 2, and its About screen grants "version 2 of the License, or (at your option) any later version", which allows their use in this GPL-3.0 project.
+- **Modern theme graphics** come from [jimnastic89/ModernScrambledNet](https://github.com/jimnastic89/ModernScrambledNet), a fork of the original. Its About text uses the same "version 2 or any later version" grant. The repository has no separate license file.
+- **Title logo** (`public/assets/title.png`) was made for this project from the original app icon.
