@@ -3,6 +3,9 @@ Scrambled Net is a simple puzzle game which requires you to sort out the connect
 You need to rotate individual tiles to re-connect the network. Tiles which are connected to the server are shown highlighted. When all terminals are connected, you've won.
 
 Features:
-* Multiple difficulty levels (Novice to Insane)
+* Five difficulty levels, from Novice to Insane
 * Retro and Modern themes
 * Sound effects
+* Lock tiles in place with a long press
+* Available in 39 languages
+* Works offline, no ads, no tracking and no data collection

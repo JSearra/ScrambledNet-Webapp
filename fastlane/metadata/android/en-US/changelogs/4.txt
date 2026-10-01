@@ -1,0 +1,5 @@
+- Available in 39 languages, picked automatically from your device language; change it with the new globe button
+- Right-to-left layout for Arabic and Persian
+- New "Scrambled Net" title logo on the start screen
+- The "Main Menu" button after finishing a level now goes straight back to the start screen
+- Landscape phones: menu buttons fit on screen in rows of three
