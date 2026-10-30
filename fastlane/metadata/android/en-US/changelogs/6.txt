@@ -1,0 +1,2 @@
+- The language picker is now a single list, one language per row
+- The app is called "Scrambled Net" on your home screen
