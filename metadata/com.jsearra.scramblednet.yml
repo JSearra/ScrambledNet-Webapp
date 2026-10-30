@@ -5,6 +5,8 @@ AuthorName: Jonathan Searra
 SourceCode: https://github.com/JSearra/ScrambledNet-Webapp
 IssueTracker: https://github.com/JSearra/ScrambledNet-Webapp/issues
 
+AutoName: ScrambledNet
+
 RepoType: git
 Repo: https://github.com/JSearra/ScrambledNet-Webapp.git
 
