@@ -632,13 +632,15 @@ html {
 }
 
 /* Language */
-.language-modal {
-    width: 440px;
+// One narrow column, also on wide and landscape screens
+.modal-content.language-modal {
+    width: 360px;
 }
 
 .language-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    // One language per row
+    grid-template-columns: 1fr;
     gap: 8px;
     overflow-y: auto;
     // Room for the buttons' shadows and focus rings inside the scroll area
@@ -661,10 +663,6 @@ html {
         stroke-linecap: round;
         stroke-linejoin: round;
     }
-}
-
-.language-auto {
-    grid-column: 1 / -1;
 }
 
 /* Game screen */
