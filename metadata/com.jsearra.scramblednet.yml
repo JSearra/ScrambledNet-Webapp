@@ -23,7 +23,7 @@ Builds:
       - yes
     prebuild:
       - cd ../..
-      - npm install --build-from-source
+      - npm_config_build_from_source=true npm install
       - npm run build
       - npx cap sync android
     scanignore:
