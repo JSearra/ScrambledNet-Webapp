@@ -44,7 +44,7 @@ Automatic updates are enabled (`UpdateCheckMode: Tags`, `AutoUpdateMode: Version
 2. Reopen merge request [!33313](https://gitlab.com/fdroid/fdroiddata/-/merge_requests/33313), or open a new one against `fdroid/fdroiddata` `master` using the "App inclusion" template.
 3. Wait for the pipeline, then answer reviewer comments promptly. Merge requests with no activity for a few weeks are closed.
 
-The F-Droid build server runs Debian trixie and installs Node.js from Debian (`apt-get install -y npm`). Vite needs Node 20.19 or newer.
+The F-Droid build server runs Debian trixie, whose Node.js (20.19) is too old for the Capacitor CLI (Node 22 or newer). The recipe therefore downloads the official Node.js 22 tarball and checks its SHA-256.
 
 ## Translations
 
