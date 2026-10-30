@@ -495,7 +495,7 @@ export class Board {
         }
         
         // Draw a highlight border around the selected cell
-        ctx.strokeStyle = '#00ffff';
+        ctx.strokeStyle = this.assets.selectionColor ?? '#00ffff';
         ctx.lineWidth = 3;
         ctx.strokeRect(
             cell.cellLeft | 0,

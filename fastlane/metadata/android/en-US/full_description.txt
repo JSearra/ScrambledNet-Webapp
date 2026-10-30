@@ -5,6 +5,7 @@ You need to rotate individual tiles to re-connect the network. Tiles which are c
 Features:
 * Five difficulty levels, from Novice to Insane
 * Retro and Modern themes
+* Light and dark mode, following your device or chosen in Settings
 * Sound effects
 * Lock tiles in place with a long press
 * Available in 39 languages

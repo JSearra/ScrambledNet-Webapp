@@ -1,0 +1,6 @@
+- New look: raised buttons, a cyan accent and tidier panels
+- Light and dark mode: follows your device, or pick one under Settings > Appearance
+- New light "Blueprint" board for the Modern theme in light mode
+- The current difficulty is shown below the board
+- Settings, Language and Instructions close with the × at the top
+- Theme and Appearance switch with one tap

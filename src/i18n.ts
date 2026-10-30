@@ -84,12 +84,24 @@ export function t(key: string): string {
 }
 
 /**
- * Fill in every element marked with data-i18n (text), data-i18n-html (trusted
- * markup from our own locale files) or data-i18n-aria (aria-label).
+ * A translation without its trailing colon, for labels set above a value
+ * ("Time:" -> "Time"). Handles "Temps :" (French) and "时间：" (Chinese, Japanese).
+ */
+export function label(key: string): string {
+    return t(key).replace(/\s*[:：]\s*$/, '');
+}
+
+/**
+ * Fill in every element marked with data-i18n (text), data-i18n-label (text
+ * without a trailing colon), data-i18n-html (trusted markup from our own
+ * locale files) or data-i18n-aria (aria-label).
  */
 export function applyTranslations(root: ParentNode = document): void {
     root.querySelectorAll<HTMLElement>('[data-i18n]').forEach(el => {
         el.textContent = t(el.dataset.i18n!);
+    });
+    root.querySelectorAll<HTMLElement>('[data-i18n-label]').forEach(el => {
+        el.textContent = label(el.dataset.i18nLabel!);
     });
     root.querySelectorAll<HTMLElement>('[data-i18n-html]').forEach(el => {
         el.innerHTML = t(el.dataset.i18nHtml!);

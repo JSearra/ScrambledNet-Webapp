@@ -7,57 +7,88 @@
     <title>Scrambled Net</title>
     <link rel="icon" type="image/png" href="./assets/logo-N_YuRi-9.png">
     <link rel="apple-touch-icon" href="./assets/logo-N_YuRi-9.png">
+    <meta name="color-scheme" content="dark light">
     <meta name="theme-color" content="#222222">
     <meta name="description" content="A puzzle game to connect the network">
-  <script type="module" crossorigin src="./assets/index-DNh6StQV.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-DVNAQLmr.css">
+  <script type="module" crossorigin src="./assets/index-sJ7o-Jx-.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-D-LkG1VF.css">
 <link rel="manifest" href="./manifest.webmanifest"></head>
 
 <body>
     <div id="start-screen">
         <img src="assets/title.png" alt="Scrambled Net" class="game-logo" width="1191" height="370">
-        <div class="difficulty-menu">
-            <button id="skill-novice" class="menu-btn" data-i18n="skill.novice">Novice</button>
-            <button id="skill-normal" class="menu-btn" data-i18n="skill.normal">Normal</button>
-            <button id="skill-expert" class="menu-btn" data-i18n="skill.expert">Expert</button>
-            <button id="skill-master" class="menu-btn" data-i18n="skill.master">Master</button>
-            <button id="skill-insane" class="menu-btn" data-i18n="skill.insane">Insane</button>
-            <button id="instructions-btn" class="menu-btn" data-i18n="menu.instructions">Instructions</button>
-            <button id="settings-btn" class="menu-btn" data-i18n="menu.settings">Settings</button>
-            <button id="install-btn" class="menu-btn hidden" data-i18n="menu.install">Install</button>
-            <button id="language-btn" class="menu-btn language-btn" data-i18n-aria="language.title" aria-label="Language">
-                <svg class="globe-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <circle cx="12" cy="12" r="9.5" />
-                    <ellipse cx="12" cy="12" rx="4" ry="9.5" />
-                    <path d="M2.5 12h19M4 7h16M4 17h16" />
-                </svg>
-                <span id="language-current">English</span>
-            </button>
+        <div class="menu-card">
+            <div class="difficulty-menu">
+                <button id="skill-novice" class="menu-btn"><span class="label" data-i18n="skill.novice">Novice</span></button>
+                <button id="skill-normal" class="menu-btn"><span class="label" data-i18n="skill.normal">Normal</span></button>
+                <button id="skill-expert" class="menu-btn"><span class="label" data-i18n="skill.expert">Expert</span></button>
+                <button id="skill-master" class="menu-btn"><span class="label" data-i18n="skill.master">Master</span></button>
+                <button id="skill-insane" class="menu-btn"><span class="label" data-i18n="skill.insane">Insane</span></button>
+            </div>
+            <div class="utility-menu">
+                <button id="instructions-btn" class="menu-btn utility">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.6v.6M12 17.2v.1" />
+                    </svg>
+                    <span class="label" data-i18n="menu.instructions">Instructions</span>
+                </button>
+                <button id="settings-btn" class="menu-btn utility">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" />
+                    </svg>
+                    <span class="label" data-i18n="menu.settings">Settings</span>
+                </button>
+                <button id="install-btn" class="menu-btn utility hidden">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M12 3.5v11M7.5 10l4.5 4.5 4.5-4.5M4.5 17v3h15v-3" />
+                    </svg>
+                    <span class="label" data-i18n="menu.install">Install</span>
+                </button>
+                <button id="language-btn" class="menu-btn utility" data-i18n-aria="language.title" aria-label="Language">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <circle cx="12" cy="12" r="9.5" />
+                        <ellipse cx="12" cy="12" rx="4" ry="9.5" />
+                        <path d="M2.5 12h19M4 7h16M4 17h16" />
+                    </svg>
+                    <span class="label" id="language-current">English</span>
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- In-Game Menu Modal -->
     <div id="ingame-menu-screen" class="hidden modal-overlay">
         <div class="modal-content">
-            <h2 data-i18n="pause.title">Paused</h2>
-
-            <div class="setting-row">
-                <label for="ingame-setting-sound" data-i18n="settings.sound">Sound Effects</label>
-                <input type="checkbox" id="ingame-setting-sound">
+            <div class="modal-header">
+                <h2 data-i18n="pause.title">Paused</h2>
             </div>
-
-            <div class="setting-row">
-                <label for="ingame-setting-theme" data-i18n="settings.theme">Theme</label>
-                <select id="ingame-setting-theme">
-                    <option value="retro" data-i18n="theme.retro">Retro</option>
-                    <option value="modern" data-i18n="theme.modern">Modern</option>
-                </select>
+            <div class="settings-list">
+                <div class="setting-row">
+                    <label for="ingame-setting-sound" data-i18n="settings.sound">Sound Effects</label>
+                    <input type="checkbox" class="switch" role="switch" id="ingame-setting-sound">
+                </div>
+                <div class="setting-row">
+                    <span id="ingame-setting-theme-label" data-i18n="settings.theme">Theme</span>
+                    <div class="segmented" role="radiogroup" aria-labelledby="ingame-setting-theme-label">
+                        <label><input type="radio" name="ingame-setting-theme" value="retro"><span data-i18n="theme.retro">Retro</span></label>
+                        <label><input type="radio" name="ingame-setting-theme" value="modern"><span data-i18n="theme.modern">Modern</span></label>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <span id="ingame-setting-appearance-label" data-i18n="settings.appearance">Appearance</span>
+                    <div class="segmented" role="radiogroup" aria-labelledby="ingame-setting-appearance-label">
+                        <label><input type="radio" name="ingame-setting-appearance" value="system"><span data-i18n="appearance.system">System</span></label>
+                        <label><input type="radio" name="ingame-setting-appearance" value="light"><span data-i18n="appearance.light">Light</span></label>
+                        <label><input type="radio" name="ingame-setting-appearance" value="dark"><span data-i18n="appearance.dark">Dark</span></label>
+                    </div>
+                </div>
             </div>
-
-            <div class="modal-actions" style="flex-direction: column; gap: 10px;">
-                <button id="ingame-resume-btn" class="menu-btn" style="width: 100%;" data-i18n="pause.resume">Resume</button>
-                <button id="ingame-solve-btn" class="menu-btn" style="width: 100%;">Solve</button>
-                <button id="ingame-quit-btn" class="menu-btn" style="width: 100%; background-color: #8b0000;" data-i18n="common.mainMenu">Main Menu</button>
+            <div class="modal-actions">
+                <button id="ingame-resume-btn" class="menu-btn primary"><span class="label" data-i18n="pause.resume">Resume</span></button>
+                <button id="ingame-solve-btn" class="menu-btn"><span class="label">Solve</span></button>
+                <button id="ingame-quit-btn" class="menu-btn danger"><span class="label" data-i18n="common.mainMenu">Main Menu</span></button>
             </div>
         </div>
     </div>
@@ -65,7 +96,12 @@
     <!-- Instructions Modal -->
     <div id="instructions-screen" class="hidden modal-overlay">
         <div class="modal-content instructions-modal">
-            <h2>Scrambled Net</h2>
+            <div class="modal-header">
+                <h2>Scrambled Net</h2>
+                <button id="instructions-close-btn" class="close-btn" data-i18n-aria="common.close" aria-label="Close">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                </button>
+            </div>
             <div class="instructions-text">
                 <p data-i18n-html="instructions.intro"><strong>Scrambled Net</strong> is a simple puzzle game which requires you to sort out the connections
                     in a computer network, so that all the terminals are connected to the server. The network is made up
@@ -73,39 +109,28 @@
                     useless mess.</p>
                 <p data-i18n="instructions.goal">You need to rotate individual tiles to re-connect the network. Tiles which are connected to the
                     server are shown highlighted. When all terminals are connected, you've won.</p>
-
                 <h3 data-i18n="instructions.controlsTitle">Controls</h3>
                 <p data-i18n="instructions.tap">Tap any tile to rotate it once clockwise. Keep tapping until the tile is in the right orientation.
                 </p>
                 <p data-i18n="instructions.lock">Long-press (or right-click) a tile to lock it in place so you can't rotate it by accident. Do it
                     again to unlock. With a keyboard, use the arrow keys, Space to rotate and L to lock.</p>
-
-
                 <h3 data-i18n="instructions.skillTitle">Skill Levels</h3>
-                <ul>
-                    <li><strong data-i18n="skill.novice">Novice</strong>: <span data-i18n="skillDesc.novice">Small board. Connect edges carefully.</span></li>
-                    <li><strong data-i18n="skill.normal">Normal</strong>: <span data-i18n="skillDesc.normal">Larger board. You can always finish by using all tiles.</span></li>
-                    <li><strong data-i18n="skill.expert">Expert</strong>: <span data-i18n="skillDesc.expert">Even larger board.</span></li>
-                    <li><strong data-i18n="skill.master">Master</strong>: <span data-i18n="skillDesc.master">Large board, wraps around edges (connections go off one side and enter
+                <ul class="skill-table">
+                    <li><strong data-i18n="skill.novice">Novice</strong><span data-i18n="skillDesc.novice">Small board. Connect edges carefully.</span></li>
+                    <li><strong data-i18n="skill.normal">Normal</strong><span data-i18n="skillDesc.normal">Larger board. You can always finish by using all tiles.</span></li>
+                    <li><strong data-i18n="skill.expert">Expert</strong><span data-i18n="skillDesc.expert">Even larger board.</span></li>
+                    <li><strong data-i18n="skill.master">Master</strong><span data-i18n="skillDesc.master">Large board, wraps around edges (connections go off one side and enter
                         the other). Also includes 4-way connections.</span></li>
-                    <li><strong data-i18n="skill.insane">Insane</strong>: <span data-i18n="skillDesc.insane">Same as Master, but harder!</span></li>
+                    <li><strong data-i18n="skill.insane">Insane</strong><span data-i18n="skillDesc.insane">Same as Master, but harder!</span></li>
                 </ul>
-
                 <h3 data-i18n="credits.title">Credits</h3>
-
                 <p data-i18n="credits.original">The original Scrambled Net was inspired by KNetWalk, and was built by Ian Cameron Smith.</p>
                 <p><span data-i18n="credits.modern">This version was created using updated assets from "Scrambled Net Modern", by jimnastic89</span>
                     https://github.com/jimnastic89/ModernScrambledNet
                 </p>
                 <p data-i18n="credits.webapp">This version updated and converted to a webapp by Jonathan Searra</p>
-
                 <h3 data-i18n="privacy.title">Privacy</h3>
-
                 <p data-i18n-html="privacy.text">Scrambled Net collects no personal data. Read the <a href="privacy.html">privacy policy</a>.</p>
-
-            </div>
-            <div class="modal-actions">
-                <button id="instructions-back-btn" class="menu-btn" data-i18n="common.back">Back</button>
             </div>
         </div>
     </div>
@@ -113,23 +138,32 @@
     <!-- Settings Modal -->
     <div id="settings-screen" class="hidden modal-overlay">
         <div class="modal-content">
-            <h2 data-i18n="menu.settings">Settings</h2>
-
-            <div class="setting-row">
-                <label for="setting-sound" data-i18n="settings.sound">Sound Effects</label>
-                <input type="checkbox" id="setting-sound" checked>
+            <div class="modal-header">
+                <h2 data-i18n="menu.settings">Settings</h2>
+                <button id="settings-close-btn" class="close-btn" data-i18n-aria="common.close" aria-label="Close">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                </button>
             </div>
-
-            <div class="setting-row">
-                <label for="setting-theme" data-i18n="settings.theme">Theme</label>
-                <select id="setting-theme">
-                    <option value="retro" data-i18n="theme.retro">Retro</option>
-                    <option value="modern" data-i18n="theme.modern">Modern</option>
-                </select>
-            </div>
-
-            <div class="modal-actions">
-                <button id="settings-close-btn" class="menu-btn" data-i18n="common.close">Close</button>
+            <div class="settings-list">
+                <div class="setting-row">
+                    <label for="setting-sound" data-i18n="settings.sound">Sound Effects</label>
+                    <input type="checkbox" class="switch" role="switch" id="setting-sound" checked>
+                </div>
+                <div class="setting-row">
+                    <span id="setting-theme-label" data-i18n="settings.theme">Theme</span>
+                    <div class="segmented" role="radiogroup" aria-labelledby="setting-theme-label">
+                        <label><input type="radio" name="setting-theme" value="retro"><span data-i18n="theme.retro">Retro</span></label>
+                        <label><input type="radio" name="setting-theme" value="modern"><span data-i18n="theme.modern">Modern</span></label>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <span id="setting-appearance-label" data-i18n="settings.appearance">Appearance</span>
+                    <div class="segmented" role="radiogroup" aria-labelledby="setting-appearance-label">
+                        <label><input type="radio" name="setting-appearance" value="system"><span data-i18n="appearance.system">System</span></label>
+                        <label><input type="radio" name="setting-appearance" value="light"><span data-i18n="appearance.light">Light</span></label>
+                        <label><input type="radio" name="setting-appearance" value="dark"><span data-i18n="appearance.dark">Dark</span></label>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -137,11 +171,13 @@
     <!-- Language Modal -->
     <div id="language-screen" class="hidden modal-overlay">
         <div class="modal-content language-modal">
-            <h2 data-i18n="language.title">Language</h2>
-            <div id="language-list" class="language-list"></div>
-            <div class="modal-actions">
-                <button id="language-close-btn" class="menu-btn" data-i18n="common.close">Close</button>
+            <div class="modal-header">
+                <h2 data-i18n="language.title">Language</h2>
+                <button id="language-close-btn" class="close-btn" data-i18n-aria="common.close" aria-label="Close">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                </button>
             </div>
+            <div id="language-list" class="language-list"></div>
         </div>
     </div>
 
@@ -156,21 +192,29 @@
         <div id="game-container">
             <canvas id="game-canvas"></canvas>
             <div id="ui-overlay" class="hidden">
-                <h1 id="message">You Win!</h1>
-                <div id="final-stats" class="stats-container">
-
-                    <p><span class="stat-label" data-i18n="stats.time">Time:</span> <span id="final-time"></span></p>
-                    <p><span class="stat-label" data-i18n="stats.moves">Moves:</span> <span id="final-moves"></span></p>
-                </div>
-                <div class="overlay-buttons">
-                    <button id="play-again-btn" class="menu-btn" data-i18n="win.playAgain">Play Again</button>
-                    <button id="menu-btn" class="menu-btn" data-i18n="common.mainMenu">Main Menu</button>
+                <div class="win-card">
+                    <h1 id="message">You Win!</h1>
+                    <div id="final-stats" class="win-stats">
+                        <div><span class="win-stat-label" data-i18n-label="stats.time">Time</span> <span id="final-time"></span></div>
+                        <div><span class="win-stat-label" data-i18n-label="stats.moves">Moves</span> <span id="final-moves"></span></div>
+                    </div>
+                    <div class="overlay-buttons">
+                        <button id="play-again-btn" class="menu-btn primary"><span class="label" data-i18n="win.playAgain">Play Again</span></button>
+                        <button id="menu-btn" class="menu-btn"><span class="label" data-i18n="common.mainMenu">Main Menu</span></button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div id="bottom-bar">
-            <button id="back-btn" class="control-btn" data-i18n="game.menu">Menu</button>
+            <button id="back-btn" class="menu-btn small">
+                <svg class="icon" viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+                    <rect x="1" y="1" width="3" height="8" rx="0.6" />
+                    <rect x="6" y="1" width="3" height="8" rx="0.6" />
+                </svg>
+                <span class="label" data-i18n="game.menu">Menu</span>
+            </button>
+            <span id="skill-chip" class="skill-chip"></span>
         </div>
     </div>
 </body>

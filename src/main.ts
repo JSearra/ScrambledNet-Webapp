@@ -28,15 +28,45 @@ function applyLanguagePreference() {
     updateLanguageButton();
 }
 
-// Translate right away (the DOM is parsed when this module runs) so English
-// doesn't flash up while the game's images are still loading.
+// --- Appearance ---
+// "system" follows the device's dark mode setting; "light" and "dark" override it.
+// The colours themselves are in style.scss, keyed on data-appearance.
+const APPEARANCES = ['system', 'light', 'dark'];
+let appearancePreference = 'system';
+const prefersLight = window.matchMedia('(prefers-color-scheme: light)');
+
+// Set once the game exists: switches the board between its dark and light colours
+let onAppearanceChange = () => {};
+
+function isLight() {
+    return appearancePreference === 'light' || (appearancePreference === 'system' && prefersLight.matches);
+}
+
+function applyAppearance() {
+    const root = document.documentElement;
+    if (appearancePreference === 'system') {
+        delete root.dataset.appearance;
+    } else {
+        root.dataset.appearance = appearancePreference;
+    }
+    // Browser chrome (address bar, PWA title bar) matches the page background
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isLight() ? '#e9edf1' : '#222222');
+    onAppearanceChange();
+}
+
+prefersLight.addEventListener('change', applyAppearance);
+
+// Translate and colour right away (the DOM is parsed when this module runs) so
+// English or the wrong colours don't flash up while the game's images are still loading.
 try {
     const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? '{}');
     if (typeof stored.language === 'string') languagePreference = stored.language;
+    if (APPEARANCES.includes(stored.appearance)) appearancePreference = stored.appearance;
 } catch {
-    // No or unreadable saved settings: follow the device language
+    // No or unreadable saved settings: follow the device language and dark mode setting
 }
 applyLanguagePreference();
+applyAppearance();
 
 // PWA Install Prompt Handler
 let deferredPrompt: any = null;
@@ -66,19 +96,18 @@ window.addEventListener('load', () => {
     const startScreen = document.getElementById('start-screen')!;
     const gameScreen = document.getElementById('game-screen')!;
     const uiOverlay = document.getElementById('ui-overlay')!;
+    const skillChip = document.getElementById('skill-chip')!;
 
     // Buttons
     const backBtn = document.getElementById('back-btn');
     const playAgainBtn = document.getElementById('play-again-btn');
     const menuBtn = document.getElementById('menu-btn');
-    
+
     // In-Game Menu Controls
     const ingameMenuScreen = document.getElementById('ingame-menu-screen')!;
     const resumeBtn = document.getElementById('ingame-resume-btn')!;
     const quitBtn = document.getElementById('ingame-quit-btn')!;
     const solveBtn = document.getElementById('ingame-solve-btn')!;
-    const ingameSoundToggle = document.getElementById('ingame-setting-sound') as HTMLInputElement;
-    const ingameThemeSelect = document.getElementById('ingame-setting-theme') as HTMLSelectElement;
 
     // Helper to switch screens
     function showScreen(screen: HTMLElement) {
@@ -91,6 +120,9 @@ window.addEventListener('load', () => {
     function startGame(skill: Skill) {
         showScreen(gameScreen);
         uiOverlay.classList.add('hidden'); // Ensure overlay is hidden
+        // data-i18n so the chip follows a language change
+        skillChip.dataset.i18n = `skill.${skill.label.toLowerCase()}`;
+        skillChip.textContent = t(skillChip.dataset.i18n);
         game.start(skill);
         // Ensure resize happens after layout change
         setTimeout(() => {
@@ -112,6 +144,57 @@ window.addEventListener('load', () => {
     document.getElementById('skill-master')!.addEventListener('click', () => startGame(SKILL.MASTER));
     document.getElementById('skill-insane')!.addEventListener('click', () => startGame(SKILL.INSANE));
 
+    // Light mode with the Modern theme uses the Blueprint board
+    function updateBoardStyle() {
+        game.assets.setLightBoard(isLight());
+        document.documentElement.toggleAttribute('data-blueprint', game.assets.blueprint);
+        if (!gameScreen.classList.contains('hidden')) {
+            game.draw();
+        }
+    }
+    onAppearanceChange = updateBoardStyle;
+
+    // --- Settings (the Settings screen and the in-game menu share these) ---
+    function setTheme(newTheme: string) {
+        if (newTheme === game.assets.theme) return;
+        game.assets.setTheme(newTheme).then(() => {
+            updateBoardStyle();
+            updateThemeVisuals(newTheme);
+            saveSettings(); // Save after successful theme set
+            console.log('Theme switched to', newTheme);
+        });
+    }
+
+    /** Wire up one panel's controls; returns a function that shows the current settings in it. */
+    function bindSettingsPanel(prefix: string) {
+        const sound = document.getElementById(`${prefix}-sound`) as HTMLInputElement;
+        const themes = document.querySelectorAll<HTMLInputElement>(`input[name="${prefix}-theme"]`);
+        const appearances = document.querySelectorAll<HTMLInputElement>(`input[name="${prefix}-appearance"]`);
+
+        sound.addEventListener('change', () => {
+            game.assets.muted = !sound.checked;
+            saveSettings();
+        });
+        themes.forEach(input => input.addEventListener('change', () => {
+            if (input.checked) setTheme(input.value);
+        }));
+        appearances.forEach(input => input.addEventListener('change', () => {
+            if (!input.checked) return;
+            appearancePreference = input.value;
+            applyAppearance();
+            saveSettings();
+        }));
+
+        return () => {
+            sound.checked = !game.assets.muted;
+            themes.forEach(input => input.checked = input.value === game.assets.theme);
+            appearances.forEach(input => input.checked = input.value === appearancePreference);
+        };
+    }
+
+    const syncIngameSettings = bindSettingsPanel('ingame-setting');
+    const syncSettings = bindSettingsPanel('setting');
+
     // Game Controls (The "Menu" button during gameplay)
     // Show in-game menu instead of quitting immediately
     function openIngameMenu() {
@@ -119,9 +202,8 @@ window.addEventListener('load', () => {
 
         // Sync In-Game UI with current state
         solveBtn.classList.toggle('hidden', !game.running);
-        solveBtn.innerText = game.board.isSolving() ? t('pause.stopSolving') : t('pause.solve');
-        ingameSoundToggle.checked = !game.assets.muted;
-        ingameThemeSelect.value = game.assets.theme;
+        solveBtn.querySelector('.label')!.textContent = game.board.isSolving() ? t('pause.stopSolving') : t('pause.solve');
+        syncIngameSettings();
     }
 
     backBtn!.addEventListener('click', openIngameMenu);
@@ -150,26 +232,6 @@ window.addEventListener('load', () => {
         game.toggleSolve();
     });
 
-    // In-Game Settings Listeners
-    ingameSoundToggle.addEventListener('change', (e: Event) => {
-        game.assets.muted = !(e.target as HTMLInputElement).checked;
-        saveSettings();
-    });
-
-    ingameThemeSelect.addEventListener('change', (e: Event) => {
-        const newTheme = (e.target as HTMLSelectElement).value;
-        if (newTheme !== game.assets.theme) {
-            game.assets.setTheme(newTheme).then(() => {
-                if (!gameScreen.classList.contains('hidden')) {
-                    game.draw();
-                }
-                updateThemeVisuals(newTheme);
-                saveSettings(); // Save after successful theme set
-                console.log('Theme switched to', newTheme);
-            });
-        }
-    });
-
     quitBtn.addEventListener('click', () => {
         ingameMenuScreen.classList.add('hidden');
         uiOverlay.classList.add('hidden'); // Also hide the win overlay if it was open (though menu button usually available during gameplay)
@@ -179,13 +241,13 @@ window.addEventListener('load', () => {
     // Instructions Modal
     const instructionsBtn = document.getElementById('instructions-btn');
     const instructionsScreen = document.getElementById('instructions-screen')!;
-    const instructionsBackBtn = document.getElementById('instructions-back-btn');
+    const instructionsCloseBtn = document.getElementById('instructions-close-btn');
 
     instructionsBtn!.addEventListener('click', () => {
         instructionsScreen.classList.remove('hidden');
     });
 
-    instructionsBackBtn!.addEventListener('click', () => {
+    instructionsCloseBtn!.addEventListener('click', () => {
         instructionsScreen.classList.add('hidden');
     });
 
@@ -193,14 +255,10 @@ window.addEventListener('load', () => {
     const settingsBtn = document.getElementById('settings-btn');
     const settingsScreen = document.getElementById('settings-screen')!;
     const settingsCloseBtn = document.getElementById('settings-close-btn');
-    const soundToggle = document.getElementById('setting-sound') as HTMLInputElement;
-    const themeSelect = document.getElementById('setting-theme') as HTMLSelectElement;
 
     settingsBtn!.addEventListener('click', () => {
         settingsScreen.classList.remove('hidden');
-        // Sync UI with current state
-        soundToggle.checked = !game.assets.muted;
-        themeSelect.value = game.assets.theme;
+        syncSettings();
     });
 
     settingsCloseBtn!.addEventListener('click', () => {
@@ -228,12 +286,21 @@ window.addEventListener('load', () => {
             const button = document.createElement('button');
             const selected = option.code === languagePreference;
             button.type = 'button';
-            button.className = option.code === AUTO_LANGUAGE ? 'language-option language-auto' : 'language-option';
+            button.className = option.code === AUTO_LANGUAGE ? 'menu-btn language-auto' : 'menu-btn';
+            // The language in use is the one cyan button, with a tick
+            button.classList.toggle('primary', selected);
             button.classList.toggle('selected', selected);
             button.setAttribute('aria-pressed', String(selected));
             button.lang = option.lang;
             button.dir = 'auto'; // Each name in its own script direction
-            button.textContent = option.name;
+            if (selected) {
+                button.insertAdjacentHTML('beforeend',
+                    '<svg class="tick" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2 6.5l2.6 2.6L10 3.5"/></svg>');
+            }
+            const name = document.createElement('span');
+            name.className = 'label';
+            name.textContent = option.name;
+            button.append(name);
             button.addEventListener('click', () => {
                 languagePreference = option.code;
                 applyLanguagePreference();
@@ -259,14 +326,14 @@ window.addEventListener('load', () => {
     if (installBtn) {
         installBtn.addEventListener('click', async () => {
             if (!deferredPrompt) return;
-            
+
             deferredPrompt.prompt();
             const choiceResult = await deferredPrompt.userChoice;
-            
+
             if (choiceResult.outcome === 'accepted') {
                 console.log('User accepted the install prompt');
             }
-            
+
             deferredPrompt = null;
             installBtn.classList.add('hidden');
         });
@@ -295,7 +362,8 @@ window.addEventListener('load', () => {
         const settings = {
             theme: game.assets.theme,
             muted: game.assets.muted,
-            language: languagePreference
+            language: languagePreference,
+            appearance: appearancePreference
         };
         try {
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
@@ -303,30 +371,6 @@ window.addEventListener('load', () => {
             console.error('Failed to save settings', e);
         }
     }
-
-    // Initialize
-    loadSettings();
-    showScreen(startScreen);
-
-    // --- Event Listeners Update ---
-    soundToggle.addEventListener('change', (e: Event) => {
-        game.assets.muted = !(e.target as HTMLInputElement).checked;
-        saveSettings();
-    });
-
-    themeSelect.addEventListener('change', (e: Event) => {
-        const newTheme = (e.target as HTMLSelectElement).value;
-        if (newTheme !== game.assets.theme) {
-            game.assets.setTheme(newTheme).then(() => {
-                if (!gameScreen.classList.contains('hidden')) {
-                    game.draw();
-                }
-                updateThemeVisuals(newTheme);
-                saveSettings(); // Save after successful theme set
-                console.log('Theme switched to', newTheme);
-            });
-        }
-    });
 
     function updateThemeVisuals(theme: string) {
         const gameContainer = document.getElementById('game-container')!;
@@ -360,5 +404,6 @@ window.addEventListener('load', () => {
 
     // Initialize
     loadSettings();
+    updateBoardStyle();
     showScreen(startScreen);
 });

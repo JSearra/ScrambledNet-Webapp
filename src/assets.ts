@@ -2,6 +2,24 @@ import { BLIP_SPRITES } from './cell';
 // Use Vite's glob import to get all assets with their hashed URLs
 const assetFiles = import.meta.glob('../assets/**/*', { eager: true, query: '?url', import: 'default' });
 
+// Light-mode colours for the Modern board ("Blueprint"): pale blue tiles on a
+// blue grid with navy cables. Tiles are drawn as plain squares and the white
+// cable images are tinted, so no extra artwork is needed.
+export const BLUEPRINT = {
+    background: '#cfdeea',
+    line: '#c4d6e4',
+    cable: '#1d3b5a',
+    iconShadow: 'rgba(20, 45, 80, 0.3)',
+    selection: '#0a7f8e',
+};
+
+const BLUEPRINT_TILES: Record<string, string> = {
+    'background.png': '#e6f0f7',
+    'background_locked.png': '#c9dbe9',
+    'empty.png': '#d7e5f0',
+    'nothing.png': BLUEPRINT.background,
+};
+
 export class Assets {
     images: { [key: string]: HTMLImageElement };
     sounds: { [key: string]: HTMLAudioElement };
@@ -9,6 +27,8 @@ export class Assets {
     loaded: number;
     muted: boolean;
     theme: string;
+    lightBoard: boolean;
+    private blueprintImages: Map<string, HTMLCanvasElement>;
 
     constructor() {
         this.images = {};
@@ -17,6 +37,8 @@ export class Assets {
         this.loaded = 0;
         this.muted = false;
         this.theme = 'modern'; // Default theme
+        this.lightBoard = false;
+        this.blueprintImages = new Map();
     }
 
     setTheme(theme: string) {
@@ -24,7 +46,35 @@ export class Assets {
         // Reload all images with the new theme path
         this.loaded = 0;
         this.toLoad = 0;
+        this.blueprintImages.clear();
         return this.loadAll();
+    }
+
+    /** Light mode: the Modern board switches to the Blueprint colours. */
+    setLightBoard(on: boolean) {
+        this.lightBoard = on;
+    }
+
+    get blueprint(): boolean {
+        return this.lightBoard && this.theme === 'modern';
+    }
+
+    get boardBackground(): string {
+        return this.blueprint ? BLUEPRINT.background : '#000';
+    }
+
+    get selectionColor(): string {
+        return this.blueprint ? BLUEPRINT.selection : '#00ffff';
+    }
+
+    /** Opacity of cables that aren't connected to the server yet. */
+    get disconnectedAlpha(): number {
+        return this.blueprint ? 0.35 : 0.5;
+    }
+
+    /** Shadow behind the server and terminals, so their white frames show on light tiles. */
+    get iconShadow(): string | null {
+        return this.blueprint ? BLUEPRINT.iconShadow : null;
     }
 
     getAssetUrl(path: string) {
@@ -121,8 +171,40 @@ export class Assets {
         });
     }
 
-    getImage(name: string) {
-        return this.images[name];
+    getImage(name: string): CanvasImageSource | undefined {
+        const img = this.images[name];
+        if (!this.blueprint || !img) return img;
+        return this.blueprintImage(name, img) ?? img;
+    }
+
+    // Blueprint versions of the tile backgrounds and cables, made once and cached
+    private blueprintImage(name: string, img: HTMLImageElement): HTMLCanvasElement | null {
+        const cached = this.blueprintImages.get(name);
+        if (cached) return cached;
+
+        const tile = BLUEPRINT_TILES[name];
+        if (!tile && !name.startsWith('cable')) return null;
+        if (!tile && !(img.complete && img.naturalWidth)) return null; // Not loaded yet
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        if (tile) {
+            // A square with a 1px grid line on each edge
+            canvas.width = canvas.height = 128;
+            ctx.fillStyle = name === 'nothing.png' ? tile : BLUEPRINT.line;
+            ctx.fillRect(0, 0, 128, 128);
+            ctx.fillStyle = tile;
+            ctx.fillRect(1, 1, 126, 126);
+        } else {
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            ctx.drawImage(img, 0, 0);
+            ctx.globalCompositeOperation = 'source-in';
+            ctx.fillStyle = BLUEPRINT.cable;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        this.blueprintImages.set(name, canvas);
+        return canvas;
     }
 
     playSound(name: string) {

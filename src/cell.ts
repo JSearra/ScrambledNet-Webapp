@@ -341,7 +341,7 @@ export class Cell {
                 // Canvas doesn't support easy tinting without offscreen canvas or globalCompositeOperation tricks.
                 // For now, let's just draw it. Optionally use globalAlpha for disconnected? 
                 if (!this.isConnected && !this.isRoot) {
-                    ctx.globalAlpha = 0.5; // Visual cue for disconnected
+                    ctx.globalAlpha = this.assets.disconnectedAlpha ?? 0.5; // Visual cue for disconnected
                 }
                 ctx.drawImage(img, -w / 2, -h / 2, w, h);
                 ctx.globalAlpha = 1.0;
@@ -350,6 +350,14 @@ export class Cell {
 
         // Un-rotate for decoration (Server / Terminal) so they stay upright
         ctx.rotate(-(this.rotateAngle * Math.PI) / 180);
+
+        // On light boards a soft shadow keeps the icons' white frames visible
+        const iconShadow = this.assets.iconShadow;
+        if (iconShadow) {
+            ctx.shadowColor = iconShadow;
+            ctx.shadowBlur = w / 14;
+            ctx.shadowOffsetY = w / 50;
+        }
 
         if (this.isRoot) {
             const serverImg = this.assets.getImage('server.png');

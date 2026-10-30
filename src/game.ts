@@ -183,7 +183,7 @@ export class Game {
     }
 
     draw(now = performance.now()) {
-        this.ctx.fillStyle = '#000';
+        this.ctx.fillStyle = this.assets.boardBackground;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.board.draw(this.ctx);
         this.board.drawBlips(this.ctx, now);

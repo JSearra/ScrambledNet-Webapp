@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import {
-    AUTO_LANGUAGE, availableLanguages, detectLanguage, isRtl, locales, resolveLanguage, setLanguage, t,
+    AUTO_LANGUAGE, availableLanguages, detectLanguage, isRtl, label, locales, resolveLanguage, setLanguage, t,
 } from '../src/i18n';
 
 const EU_LANGUAGES = [
@@ -37,7 +37,7 @@ describe('locale files', () => {
 
     it('define every key used in index.html', () => {
         const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-        const keys = [...html.matchAll(/data-i18n(?:-html|-aria)?="([^"]+)"/g)].map(m => m[1]);
+        const keys = [...html.matchAll(/data-i18n(?:-html|-aria|-label)?="([^"]+)"/g)].map(m => m[1]);
         expect(keys.length).toBeGreaterThan(20);
         for (const key of keys) expect(locales.en, key).toHaveProperty([key]);
     });
@@ -124,6 +124,27 @@ describe('t', () => {
 
     it('returns the key for unknown keys', () => {
         expect(t('no.such.key')).toBe('no.such.key');
+    });
+});
+
+describe('label', () => {
+    it('drops the trailing colon in every language', () => {
+        for (const code of Object.keys(locales)) {
+            setLanguage(code);
+            expect(label('stats.time'), code).not.toMatch(/[:：]\s*$/);
+            expect(label('stats.time'), code).not.toBe('');
+        }
+        setLanguage('en');
+    });
+
+    it('handles English, French spacing and full-width colons', () => {
+        setLanguage('en');
+        expect(label('stats.moves')).toBe('Moves');
+        setLanguage('fr');
+        expect(label('stats.time')).toBe('Temps');
+        setLanguage('zh');
+        expect(label('stats.time')).toBe('时间');
+        setLanguage('en');
     });
 });
 
