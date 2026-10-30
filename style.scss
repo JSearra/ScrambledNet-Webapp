@@ -42,6 +42,14 @@ $accent-ink: #04252a;
     --seg-ink: #bbb;
     --switch-off: #3a434d;
     --switch-knob-off: #9aa3ad;
+
+    // Title logo
+    --logo-ink: #f2f6f9;
+    --logo-ink2: #9fb0bf;
+    --logo-edge: rgba(0, 0, 0, 0.75);
+    --logo-cyan: #{$accent};
+    --logo-cyan-deep: #13808d;
+    --logo-line: #c9d4dd;
 }
 
 @mixin light-tokens {
@@ -79,6 +87,13 @@ $accent-ink: #04252a;
     --seg-ink: #4a5560;
     --switch-off: #c3ccd5;
     --switch-knob-off: #fff;
+
+    --logo-ink: #17212b;
+    --logo-ink2: #4a5866;
+    --logo-edge: rgba(255, 255, 255, 0.9);
+    --logo-cyan: #0e9aab;
+    --logo-cyan-deep: #0a6f7b;
+    --logo-line: #1d3b5a;
 }
 
 :root {
@@ -283,10 +298,50 @@ html {
 }
 
 .game-logo {
-    width: auto;
+    display: block;
+    width: min(90%, 420px);
     height: auto;
-    max-width: min(90%, 560px);
     max-height: 22vh;
+    overflow: visible;
+
+    .logo-ink-top { stop-color: var(--logo-ink); }
+    .logo-ink-bottom { stop-color: var(--logo-ink2); }
+    .logo-cyan-top { stop-color: var(--logo-cyan); }
+    .logo-cyan-bottom { stop-color: var(--logo-cyan-deep); }
+
+    .logo-cable-edge,
+    .logo-cable,
+    .logo-cable-lit {
+        fill: none;
+        stroke-linecap: round;
+    }
+
+    .logo-cable-edge { stroke: var(--logo-edge); stroke-width: 10; }
+    .logo-cable { stroke: var(--logo-line); stroke-width: 8; }
+    .logo-cable-lit { stroke: var(--logo-cyan); stroke-width: 8; }
+    // Still waiting to be connected
+    .logo-terminal { opacity: 0.6; }
+
+    .logo-blip {
+        fill: #fff;
+        filter: drop-shadow(0 0 4px var(--logo-cyan));
+    }
+
+    .logo-scrambled {
+        fill: url(#logo-ink);
+        filter: drop-shadow(0 2px 0 var(--logo-edge));
+    }
+
+    .logo-net {
+        fill: url(#logo-cyan);
+        filter: drop-shadow(0 1px 0 var(--logo-edge));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .game-logo .logo-blip {
+        display: none;
+    }
 }
 
 .menu-card {
@@ -820,7 +875,7 @@ h1#message {
 /* Short landscape screens (phones on their side): rows of three buttons */
 @media (orientation: landscape) and (max-height: 520px) {
     .game-logo {
-        max-height: 20vh;
+        max-height: 26vh;
     }
 
     .menu-card {

@@ -85,4 +85,4 @@ Run `npm run build && npx vite preview`, set the browser viewport to 1366×768 (
 ### Asset licenses
 - **Retro theme graphics, sounds and the app icon** come from the original Scrambled Net by Ian Cameron Smith. Its source files say GPL version 2, and its About screen grants "version 2 of the License, or (at your option) any later version", which allows their use in this GPL-3.0 project.
 - **Modern theme graphics** come from [jimnastic89/ModernScrambledNet](https://github.com/jimnastic89/ModernScrambledNet), a fork of the original. Its About text uses the same "version 2 or any later version" grant. The repository has no separate license file.
-- **Title logo** (`public/assets/title.png`) was made for this project from the original app icon.
+- **Title logo** is an inline SVG in `index.html`, made for this project. It uses the Modern theme's server and terminal icons, and its lettering is [Russo One](https://fonts.google.com/specimen/Russo+One) by Jovanny Lemonad (SIL Open Font License 1.1) converted to outlines, so no font file is shipped.
